@@ -9,9 +9,9 @@ export default function Loading() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div className="mb-10">
-          {/* Mimic the header text with grey bars */}
-          <div className="h-9 w-48 bg-gray-200 rounded mb-2 animate-pulse" />
-          <div className="h-5 w-64 bg-gray-200 rounded animate-pulse" />
+        {/* Mimic the 'MegaHelper' header text */}
+        <div className="h-9 w-40 bg-gray-200 rounded mb-2 animate-pulse" />
+        <div className="h-5 w-60 bg-gray-200 rounded animate-pulse" />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">

@@ -7,8 +7,8 @@ import Navbar from "@/components/Navbar";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "The Student Hub Replica",
-  description: "E-commerce platform for digital goods",
+  title: "MegaHelper",
+  description: "The ultimate hub for premium digital assets and automation tools.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

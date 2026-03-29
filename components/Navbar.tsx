@@ -12,8 +12,8 @@ export default function Navbar() {
     <header className="bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
         
-        <Link href="/" className="text-2xl font-bold text-blue-600">
-          StudentHub
+        <Link href="/" className="text-2xl font-black text-blue-600 tracking-tight">
+          Mega<span className="text-gray-900">Helper</span>
         </Link>
 
         <div className="flex-1 max-w-2xl mx-8 hidden md:flex">
