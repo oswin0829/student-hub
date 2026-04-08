@@ -28,13 +28,17 @@ export default function ProductCard({ product }: { product: Product }) {
       {/* Clickable Image Area */}
       <Link 
         href={`/product/${product.id}`} 
-        className="relative w-full h-52 bg-gray-50 flex items-center justify-center cursor-pointer overflow-hidden"
+        className="relative w-full h-52 bg-gray-50 flex items-center justify-center cursor-pointer overflow-hidden p-4" // Added p-4 to frame the image
       >
         {product.image_url ? (
           <img 
             src={product.image_url} 
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+            /* CRITICAL FIX: 
+               1. Changed 'object-cover' to 'object-contain'
+               2. Swapped w-full h-full for max-w-full max-h-full 
+            */
+            className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-700"
           />
         ) : (
           <div className="flex flex-col items-center gap-2">
