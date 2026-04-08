@@ -3,23 +3,12 @@
 import { useState } from 'react';
 import { useCartStore } from '@/store/cartStore';
 import Link from 'next/link';
+import { createPayment } from '@/app/actions/checkout'; // 1. Imported your Server Action
 
 export default function CheckoutPage() {
   const { cart, cartTotal } = useCartStore();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
-  // This function will eventually talk to our Payment API
-  const handlePayment = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    
-    // For now, we just simulate a brief loading state
-    setTimeout(() => {
-      alert(`Payment integration coming next! We will send the goods to: ${email}`);
-      setIsLoading(false);
-    }, 1000);
-  };
 
   if (cart.length === 0) {
     return (
@@ -53,8 +42,13 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            {/* Checkout Form */}
-            <form onSubmit={handlePayment}>
+            {/* 2. THE LIVE BILLPLZ FORM */}
+            <form action={createPayment} onSubmit={() => setIsLoading(true)}>
+              
+              {/* Hidden variables to pass the cart data to Billplz */}
+              <input type="hidden" name="amount" value={cartTotal()} />
+              <input type="hidden" name="name" value="MegaHelper Cart Checkout" />
+
               <div className="mb-6">
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                   Email Address (for digital delivery)
@@ -62,6 +56,7 @@ export default function CheckoutPage() {
                 <input
                   type="email"
                   id="email"
+                  name="email" // Added name attribute so the server action can grab it
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -73,9 +68,9 @@ export default function CheckoutPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-blue-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 flex justify-center items-center"
+                className="w-full bg-blue-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 flex justify-center items-center shadow-lg active:scale-95"
               >
-                {isLoading ? "Processing..." : `Pay RM${cartTotal().toFixed(2)}`}
+                {isLoading ? "Connecting to Billplz..." : `Pay RM${cartTotal().toFixed(2)}`}
               </button>
             </form>
             

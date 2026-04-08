@@ -1,6 +1,7 @@
 import { supabase } from '@/utils/supabase';
 import { notFound } from 'next/navigation';
 import AddToCartButton from '@/components/AddToCartButton';
+import { createPayment } from '@/app/actions/checkout'; // 1. Imported your new Server Action
 
 // Next.js passes the URL parameters (like the ID) into this component
 export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -59,8 +60,26 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
               RM{product.price.toFixed(2)}
             </div>
 
-            {/* Interactive Add to Cart Component */}
-            <div className="w-full max-w-sm">
+            {/* 2. THE CHECKOUT CIRCUIT (FIXED HERE) */}
+            <div className="w-full max-w-sm flex flex-col gap-3">
+              
+              {/* Billplz Instant Checkout Form */}
+              <form action={createPayment}>
+                {/* Hidden inputs act as "variables" passing the database info to Billplz */}
+                <input type="hidden" name="amount" value={product.price} />
+                <input type="hidden" name="name" value={product.name} />
+                {/* Hardcoded email for testing, later we can add an email input field */}
+                <input type="hidden" name="email" value="oswin.test@example.com" /> 
+
+                <button 
+                  type="submit"
+                  className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition-all active:scale-95 shadow-lg"
+                >
+                  Pay with Billplz (FPX)
+                </button>
+              </form>
+
+              {/* Your Original Cart Button */}
               <AddToCartButton product={product} />
             </div>
             
