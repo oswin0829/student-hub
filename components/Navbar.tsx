@@ -1,53 +1,53 @@
-"use client"; // This tells Next.js this component runs in the user's browser
+"use client";
 
 import Link from 'next/link';
-import { Search, ShoppingCart, User } from 'lucide-react';
+import { ShoppingCart, User, Zap } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 
 export default function Navbar() {
-  // Plug into our global brain to get the live total
-  const cartTotal = useCartStore((state) => state.cartTotal());
+  const { cart } = useCartStore();
 
   return (
-    <header className="bg-white border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-        
-        <Link href="/" className="text-2xl font-black text-blue-600 tracking-tight">
-          Mega<span className="text-gray-900">Helper</span>
-        </Link>
+    <nav className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/80 backdrop-blur-xl">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Increased height from h-16 to h-20 for more 'breathing room' */}
+        <div className="flex justify-between items-center h-20">
+          
+          {/* Scaled Logo */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="bg-blue-600 p-2 rounded-xl group-hover:rotate-12 transition-all duration-300 shadow-lg shadow-blue-200">
+              <Zap size={24} className="text-white fill-current" />
+            </div>
+            <span className="text-2xl font-black text-gray-900 tracking-tighter">
+              MegaHelper
+            </span>
+          </Link>
 
-        <div className="flex-1 max-w-2xl mx-8 hidden md:flex">
-          <div className="relative w-full">
-            <input 
-              type="text" 
-              placeholder="Search products..." 
-              className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <Search className="absolute right-3 top-2.5 text-gray-400" size={20} />
+          {/* Scaled Right Side Actions */}
+          <div className="flex items-center gap-6">
+            <Link 
+              href="/login" 
+              className="flex items-center gap-2 text-base font-bold text-gray-600 hover:text-blue-600 transition-colors"
+            >
+              <User size={22} strokeWidth={2.5} />
+              <span className="hidden md:block">Login</span>
+            </Link>
+
+            <Link 
+              href="/checkout" 
+              className="relative p-2 text-gray-700 hover:text-blue-600 transition-all active:scale-90"
+            >
+              <ShoppingCart size={26} strokeWidth={2.5} />
+              {cart.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[11px] font-black h-6 w-6 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
+                  {cart.length}
+                </span>
+              )}
+            </Link>
           </div>
-        </div>
 
-        <div className="flex items-center space-x-6">
-          <Link href="/login" className="text-gray-600 hover:text-blue-600 flex items-center gap-2">
-            <User size={24} />
-            <span className="hidden sm:inline">Login</span>
-          </Link>
-          <Link href="/cart" className="text-gray-600 hover:text-blue-600 flex items-center gap-2">
-            <ShoppingCart size={24} />
-            {/* Display the live total here! */}
-            <span className="hidden sm:inline font-semibold">RM{cartTotal.toFixed(2)}</span>
-          </Link>
         </div>
       </div>
-
-      <nav className="bg-gray-50 border-t border-gray-100 hidden md:block">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex space-x-8 text-sm font-medium text-gray-700">
-          <Link href="/category/educational" className="hover:text-blue-600">Educational</Link>
-          <Link href="/category/ai-tools" className="hover:text-blue-600">AI Tools</Link>
-          <Link href="/category/writing" className="hover:text-blue-600">Writing Tools</Link>
-          <Link href="/category/entertainment" className="hover:text-blue-600">Entertainment</Link>
-        </div>
-      </nav>
-    </header>
+    </nav>
   );
 }
