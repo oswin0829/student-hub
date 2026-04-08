@@ -28,26 +28,23 @@ export default function ProductCard({ product }: { product: Product }) {
       {/* Clickable Image Area */}
       <Link 
         href={`/product/${product.id}`} 
-        className="relative w-full h-52 bg-gray-50 flex items-center justify-center cursor-pointer overflow-hidden p-4" // Added p-4 to frame the image
+        className="relative w-full aspect-square bg-white flex items-center justify-center cursor-pointer overflow-hidden p-6"
       >
         {product.image_url ? (
           <img 
             src={product.image_url} 
             alt={product.name}
-            /* CRITICAL FIX: 
-               1. Changed 'object-cover' to 'object-contain'
-               2. Swapped w-full h-full for max-w-full max-h-full 
-            */
-            className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-700"
+            /* 2. Keep object-contain so text isn't cut, 
+              but now it will be centered in a perfect square box */
+            className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-700"
           />
         ) : (
           <div className="flex flex-col items-center gap-2">
-             <span className="text-3xl opacity-20">📦</span>
-             <span className="text-gray-400 font-medium italic text-xs uppercase tracking-tighter">No Image</span>
+            <span className="text-3xl opacity-20">📦</span>
+            <span className="text-gray-400 font-medium italic text-xs uppercase tracking-tighter">No Image</span>
           </div>
         )}
         
-        {/* Subtle Overlay on Hover */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300" />
       </Link>
       
