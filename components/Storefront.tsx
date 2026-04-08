@@ -71,8 +71,10 @@ export default function Storefront({ initialProducts }: { initialProducts: Produ
           {filteredProducts.length > 0 ? (
                 <motion.div 
                 layout
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-1 2xl:grid-cols-4 gap-8"
-                >   
+                /* 1. Changed grid-cols-1 to grid-cols-2 
+                    2. Changed gap-8 to gap-3 (mobile) and gap-6+ (desktop) */
+                className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-8"
+                >
               {filteredProducts.map((product, index) => (
                 <motion.div
                   key={product.id}
