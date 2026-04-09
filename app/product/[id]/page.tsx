@@ -1,97 +1,59 @@
 import { supabase } from '@/utils/supabase';
 import { notFound } from 'next/navigation';
-import AddToCartButton from '@/components/AddToCartButton';
-import { createPayment } from '@/app/actions/checkout'; // 1. Imported your new Server Action
+import { createPayment } from '@/app/actions/checkout';
+import ProductInteraction from '@/components/ProductInteraction'; // Import the new client component
 
-// Next.js passes the URL parameters (like the ID) into this component
 export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  // Await the parameters (required in Next.js 15+)
   const resolvedParams = await params;
 
-  // Fetch the single product where the ID matches the URL
   const { data: product, error } = await supabase
     .from('products')
     .select('*')
     .eq('id', resolvedParams.id)
     .single();
 
-  if (error || !product) {
-    notFound();
-  }
+  if (error || !product) notFound();
 
   return (
-    <main className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex flex-col md:flex-row">
+    <main className="min-h-screen bg-white py-12 md:py-24">
+      <div className="max-w-6xl mx-auto px-4 md:px-8">
+        <div className="flex flex-col lg:flex-row gap-16">
           
-          {/* Left Side: Image Rendering */}
-          <div className="md:w-1/2 bg-gray-50 min-h-[400px] flex items-center justify-center border-b md:border-b-0 md:border-r border-gray-200 overflow-hidden">
+          {/* Left: Image (Cleaned up the UI) */}
+          <div className="lg:w-1/2 aspect-square bg-gray-50 rounded-3xl flex items-center justify-center p-8 border border-gray-100">
             {product.image_url ? (
-              <img 
-                src={product.image_url} 
-                alt={product.name}
-                className="w-full h-full object-cover shadow-inner"
-              />
+              <img src={product.image_url} alt={product.name} className="max-w-full max-h-full object-contain mix-blend-multiply" />
             ) : (
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                   <span className="text-gray-400">?</span>
-                </div>
-                <span className="text-gray-400 font-medium text-lg italic">No Image Available</span>
-              </div>
+              <div className="text-gray-300 font-black text-6xl">📦</div>
             )}
           </div>
 
-          {/* Right Side: Product Details */}
-          <div className="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
-            <div className="uppercase tracking-wide text-xs text-blue-600 font-bold mb-2 px-2 py-1 bg-blue-50 rounded-md inline-block self-start">
+          {/* Right: Details & Interaction */}
+          <div className="lg:w-1/2 flex flex-col justify-center">
+            <div className="uppercase tracking-[0.3em] text-[10px] text-blue-600 font-black mb-4 px-3 py-1 bg-blue-50 rounded-full w-fit">
               {product.category || "MegaHelper Tool"}
             </div>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 leading-tight">
+            
+            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 leading-tight tracking-tight">
               {product.name}
             </h1>
             
-            <p className="text-gray-600 mb-8 leading-relaxed text-lg">
-              This digital tool is a part of the **MegaHelper** ecosystem, designed for high-efficiency workflows. 
-              Get exclusive pricing and instant delivery to your inbox.
+            <p className="text-gray-500 mb-10 leading-relaxed text-lg font-medium">
+              High-efficiency automation asset from the **MegaHelper** ecosystem. 
+              Verified digital delivery.
             </p>
 
-            <div className="text-4xl font-black text-gray-900 mb-8">
-              RM{product.price.toFixed(2)}
-            </div>
-
-            {/* 2. THE CHECKOUT CIRCUIT (FIXED HERE) */}
-            <div className="w-full max-w-sm flex flex-col gap-3">
-              
-              {/* Billplz Instant Checkout Form */}
-              <form action={createPayment}>
-                {/* Hidden inputs act as "variables" passing the database info to Billplz */}
-                <input type="hidden" name="amount" value={product.price} />
-                <input type="hidden" name="name" value={product.name} />
-                {/* Hardcoded email for testing, later we can add an email input field */}
-                <input type="hidden" name="email" value="oswin.test@example.com" /> 
-
-                <button 
-                  type="submit"
-                  className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition-all active:scale-95 shadow-lg"
-                >
-                  Pay with Billplz (FPX)
-                </button>
-              </form>
-
-              {/* Your Original Cart Button */}
-              <AddToCartButton product={product} />
-            </div>
+            {/* --- THIS HANDLES THE VARIANT LOGIC NOW --- */}
+            <ProductInteraction product={product} createPayment={createPayment} />
             
-            <div className="mt-8 pt-8 border-t border-gray-100 text-sm text-gray-500 space-y-3">
-              <div className="flex items-center gap-2">
-                <span className="text-blue-500 text-lg">⚡️</span>
-                <p><span className="font-semibold text-gray-700">Instant Delivery:</span> Sent to your email immediately.</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-blue-500 text-lg">🛡️</span>
-                <p><span className="font-semibold text-gray-700">MegaHelper Verified:</span> Guaranteed working digital assets.</p>
-              </div>
+            {/* Trust Badges */}
+            <div className="mt-12 grid grid-cols-2 gap-4 border-t border-gray-100 pt-8">
+               <div className="flex items-center gap-2 text-xs font-bold text-gray-400">
+                  <span className="bg-green-100 text-green-600 p-1 rounded">✓</span> INSTANT EMAIL ACCESS
+               </div>
+               <div className="flex items-center gap-2 text-xs font-bold text-gray-400">
+                  <span className="bg-blue-100 text-blue-600 p-1 rounded">✓</span> VERIFIED ASSET
+               </div>
             </div>
           </div>
 

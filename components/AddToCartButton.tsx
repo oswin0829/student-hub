@@ -2,7 +2,7 @@
 
 import { ShoppingCart } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
-import { toast } from 'sonner'; // 1. Swapped to the correct Sonner import
+import { toast } from 'sonner';
 
 export default function AddToCartButton({ product }: { product: any }) {
   const addToCart = useCartStore((state) => state.addToCart);
@@ -10,19 +10,38 @@ export default function AddToCartButton({ product }: { product: any }) {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault(); 
     
-    // 1. Logic: Add to the Zustand store
-    addToCart(product);
+    // 1. Generate the unique ID. 
+    // If the parent component (like ProductInteraction) provided a cartId, use it.
+    // Otherwise, fallback to the raw product ID (for simple products without variants).
+    const uniqueCartId = product.cartId || String(product.id);
     
-    // 2. Feedback: Fire the Sonner toast
-    toast.success(`${product.name} added to cart!`);
+    // 2. Extract the label so the cart knows what to display.
+    const label = product.variantLabel || product.selectedLabel || "Standard";
+
+    // 3. Build the exact payload expected by the Zustand store
+    const itemToAdd = {
+      id: product.id,
+      cartId: uniqueCartId,
+      name: product.name,
+      price: product.price,
+      category: product.category || "General",
+      image_url: product.image_url,
+      selectedLabel: label, // Ensures the cart shows "(3 Months)" etc.
+    };
+
+    // 4. Send to the store
+    addToCart(itemToAdd);
+    
+    // 5. Fire the success feedback
+    toast.success(`Added ${product.name} (${label}) to cart!`);
   };
 
   return (
     <button 
       onClick={handleAddToCart}
-      className="bg-blue-600 text-white px-8 py-4 rounded-lg hover:bg-blue-700 transition-colors active:scale-95 flex items-center justify-center gap-3 font-bold text-lg w-full md:w-auto"
+      className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition-all active:scale-95 shadow-lg shadow-blue-200 flex items-center justify-center gap-3"
     >
-      <ShoppingCart size={24} />
+      <ShoppingCart size={24} strokeWidth={2.5} />
       Add to Cart
     </button>
   );
