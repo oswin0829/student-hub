@@ -13,7 +13,7 @@ export default function CartPage() {
     return (
       <main className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">Your cart is empty</h1>
-        <p className="text-gray-500 mb-8">Looks like you haven't added anything yet.</p>
+        <p className="text-gray-500 mb-8">Looks like you have not added anything yet.</p>
         <Link 
           href="/" 
           className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
@@ -50,7 +50,7 @@ export default function CartPage() {
                   <div className="flex items-center gap-3">
                     <span className="text-sm text-gray-600">Qty: {item.quantity}</span>
                     <button 
-                      onClick={() => removeFromCart(item.id)}
+                      onClick={() => removeFromCart(item.cartId)}
                       className="text-red-500 hover:text-red-700 p-1"
                     >
                       <Trash2 size={18} />

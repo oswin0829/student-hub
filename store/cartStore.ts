@@ -24,6 +24,7 @@ interface CartItem {
   quantity: number;
   category: string;
   selectedLabel?: string; // e.g., "3 Months"
+  variantLabel?: string;
 }
 
 interface CartStore {
