@@ -6,9 +6,9 @@ import Image from 'next/image';
 import { ShoppingCart, User, LogOut } from 'lucide-react'; 
 import { useCartStore } from '@/store/cartStore';
 import { createBrowserClient } from '@supabase/ssr';
-// 1. Import and rename the Supabase type to avoid the collision
 import type { User as SupabaseUser } from '@supabase/supabase-js'; 
 import { toast } from 'sonner'; 
+import { motion, AnimatePresence } from 'framer-motion'; // <-- Imported Framer Motion
 
 // Initialize Supabase Client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
@@ -19,16 +19,16 @@ export default function Navbar() {
   const { cart } = useCartStore();
   const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
   
-  // 2. Use the new renamed type here
   const [user, setUser] = useState<SupabaseUser | null>(null);
-  // Listen for login/logout events
+  
+  // <-- NEW: State to track if they clicked logout
+  const [isConfirmingLogout, setIsConfirmingLogout] = useState(false); 
+
   useEffect(() => {
-    // 1. Check if they are logged in on initial load
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
     });
 
-    // 2. Listen for live changes (like when they submit the login form)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
@@ -38,7 +38,6 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
-    
     if (error) {
       toast.error(`Logout failed: ${error.message}`);
     } else {
@@ -69,25 +68,65 @@ export default function Navbar() {
           {/* --- ACTIONS SECTION --- */}
           <div className="flex items-center gap-6 md:gap-8">
             
-            {/* Conditional User UI */}
             {user ? (
-              <div className="flex items-center gap-4 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
-                {/* User Avatar Circle (First letter of email) */}
-                <div className="w-7 h-7 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold uppercase">
+              // The User Pill Container
+              <div className="flex items-center gap-3 bg-gray-50 p-1.5 pr-2 rounded-full border border-gray-100 overflow-hidden">
+                
+                {/* User Avatar Circle */}
+                <div className="w-7 h-7 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold uppercase shrink-0">
                   {user.email?.charAt(0)}
                 </div>
+                
                 {/* User Email */}
-                <span className="hidden md:block text-sm font-bold text-slate-700 max-w-[120px] truncate">
+                <span className="hidden md:block text-sm font-bold text-slate-700 max-w-[120px] truncate pl-1">
                   {user.email}
                 </span>
-                {/* Logout Button */}
-                <button 
-                  onClick={handleLogout}
-                  className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
-                  title="Logout"
-                >
-                  <LogOut size={18} strokeWidth={2.5} />
-                </button>
+
+                {/* --- THE MORPHING LOGOUT BUTTON --- */}
+                <div className="flex items-center h-7">
+                  <AnimatePresence mode="popLayout" initial={false}>
+                    {isConfirmingLogout ? (
+                      <motion.div
+                        key="confirm-logout"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 20 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                        className="flex items-center gap-1.5 pl-2 border-l border-gray-200 ml-1"
+                      >
+                        <button
+                          onClick={() => setIsConfirmingLogout(false)}
+                          className="text-[11px] font-bold text-slate-500 hover:text-slate-800 px-2 py-1 rounded transition-colors"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={() => {
+                            handleLogout();
+                            setIsConfirmingLogout(false);
+                          }}
+                          className="text-[11px] font-bold bg-red-500 text-white hover:bg-red-600 px-3 py-1.5 rounded-full transition-colors shadow-sm"
+                        >
+                          Logout
+                        </button>
+                      </motion.div>
+                    ) : (
+                      <motion.button
+                        key="logout-btn"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                        onClick={() => setIsConfirmingLogout(true)}
+                        className="p-1 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all ml-1"
+                        title="Logout"
+                      >
+                        <LogOut size={16} strokeWidth={2.5} />
+                      </motion.button>
+                    )}
+                  </AnimatePresence>
+                </div>
+
               </div>
             ) : (
               <Link 

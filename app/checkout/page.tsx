@@ -6,7 +6,7 @@ import { createPayment } from '@/app/actions/checkout';
 import { Trash2, Plus, Minus, ShoppingBag, AlertCircle, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import { createBrowserClient } from '@supabase/ssr'; 
-import { motion, AnimatePresence } from 'framer-motion'; // <-- Imported Framer Motion
+import { motion, AnimatePresence } from 'framer-motion';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
@@ -16,6 +16,7 @@ export default function CheckoutPage() {
   const { cart, cartTotal, removeFromCart, clearCart, updateQuantity } = useCartStore();
   
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [isConfirmingClear, setIsConfirmingClear] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -47,20 +48,60 @@ export default function CheckoutPage() {
     <main className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         
-        <div className="flex items-center justify-between mb-8">
+        {/* The Upgraded Header Area with Inline Morphing Confirmation */}
+        <div className="flex items-center justify-between mb-8 overflow-hidden">
           <h1 className="text-3xl font-black text-slate-900 tracking-tight">Checkout</h1>
-          <button 
-            onClick={clearCart}
-            className="text-sm font-bold text-red-500 hover:text-red-700 hover:bg-red-50 px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
-          >
-            <Trash2 size={16} />
-            Clear Cart
-          </button>
+          
+          <div className="flex items-center h-10">
+            <AnimatePresence mode="popLayout" initial={false}>
+              {isConfirmingClear ? (
+                <motion.div
+                  key="confirm-actions"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  className="flex items-center gap-2"
+                >
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mr-2">
+                    Are you sure?
+                  </span>
+                  <button 
+                    onClick={() => setIsConfirmingClear(false)}
+                    className="text-sm font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 px-4 py-2 rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={() => {
+                      clearCart();
+                      setIsConfirmingClear(false);
+                    }}
+                    className="text-sm font-bold bg-red-100 text-red-600 hover:bg-red-200 px-4 py-2 rounded-lg transition-colors shadow-sm"
+                  >
+                    Yes, Empty
+                  </button>
+                </motion.div>
+              ) : (
+                <motion.button 
+                  key="clear-btn"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  onClick={() => setIsConfirmingClear(true)}
+                  className="text-sm font-bold text-red-500 hover:text-red-700 hover:bg-red-50 px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+                >
+                  <Trash2 size={16} />
+                  Clear Cart
+                </motion.button>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
           
-          {/* Removed divide-y divide-gray-100 from here to prevent animation glitches */}
           <div className="p-6 md:p-8">
             <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
               <ShoppingBag size={20} className="text-blue-600" /> 
@@ -68,17 +109,15 @@ export default function CheckoutPage() {
             </h2>
             
             <div className="flex flex-col pt-2">
-              {/* Added AnimatePresence to handle exits */}
               <AnimatePresence initial={false}>
                 {cart.map((item) => (
                   <motion.div 
-                    layout // Helps remaining items slide up smoothly
+                    layout 
                     key={item.cartId}
                     initial={{ opacity: 0, height: 0, scale: 0.95 }}
                     animate={{ opacity: 1, height: 'auto', scale: 1 }}
                     exit={{ opacity: 0, height: 0, scale: 0.95, overflow: 'hidden' }}
                     transition={{ duration: 0.2, ease: "easeInOut" }}
-                    // Added border-b border-gray-100 last:border-0 here instead
                     className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4 border-b border-gray-100 last:border-0"
                   >
                     
@@ -130,7 +169,6 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          {/* Payment Section stays exactly the same */}
           <div className="bg-slate-50 p-6 md:p-8 border-t border-gray-100">
             <div className="flex items-center justify-between mb-8">
               <span className="text-lg font-bold text-slate-600">Total to pay</span>

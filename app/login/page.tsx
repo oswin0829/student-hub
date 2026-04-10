@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { createBrowserClient } from '@supabase/ssr'; 
 import { toast } from 'sonner';
-import { motion } from 'framer-motion'; // <-- Imported Framer Motion
+import { motion, AnimatePresence } from 'framer-motion'; // <-- Imported AnimatePresence
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
@@ -17,6 +17,7 @@ export default function LoginPage() {
   const [authMode, setAuthMode] = useState<AuthMode>('sign_in');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState(''); // <-- Added state for confirmation
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -40,6 +41,13 @@ export default function LoginPage() {
         router.refresh();
       }
     } else {
+      // Catch password typos before sending to Supabase
+      if (password !== confirmPassword) {
+        toast.error("Passwords do not match!");
+        setLoading(false);
+        return;
+      }
+
       const { error } = await supabase.auth.signUp({ email, password });
       if (error) {
         toast.error(`Signup Failed: ${error.message}`);
@@ -54,9 +62,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4 py-12">
-      {/* Replaced <div> with <motion.div> and added the layout prop 
-        overflow-hidden prevents content from clipping during the morph
-      */}
       <motion.div 
         layout 
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
@@ -84,7 +89,10 @@ export default function LoginPage() {
           </button>
           <button
             type="button"
-            onClick={() => setAuthMode('sign_up')}
+            onClick={() => {
+              setAuthMode('sign_up');
+              setConfirmPassword(''); // Clear it when toggling modes
+            }}
             className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-300 ${
               authMode === 'sign_up' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-900'
             }`}
@@ -116,6 +124,30 @@ export default function LoginPage() {
               className="w-full border border-gray-200 bg-gray-50 p-3 rounded-xl focus:outline-none focus:border-blue-600 focus:bg-white transition-colors"
             />
           </div>
+
+          {/* --- THE LIQUID ANIMATION FIELD --- */}
+          <AnimatePresence>
+            {authMode === 'sign_up' && (
+              <motion.div 
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="flex flex-col gap-1.5 overflow-hidden"
+              >
+                <label className="text-slate-600 font-bold text-xs uppercase tracking-wider mt-1.5">
+                  Confirm Password
+                </label>
+                <input 
+                  type="password" 
+                  required={authMode === 'sign_up'}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full border border-gray-200 bg-gray-50 p-3 rounded-xl focus:outline-none focus:border-blue-600 focus:bg-white transition-colors"
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <button 
             type="submit"
