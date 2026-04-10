@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { createBrowserClient } from '@supabase/ssr'; 
 import { toast } from 'sonner';
+import { motion } from 'framer-motion'; // <-- Imported Framer Motion
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
@@ -19,7 +20,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  // Check if already logged in on mount
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) router.push('/');
@@ -54,7 +54,14 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4 py-12">
-      <div className="max-w-md w-full bg-white p-8 sm:p-10 rounded-[2rem] shadow-xl border border-gray-100">
+      {/* Replaced <div> with <motion.div> and added the layout prop 
+        overflow-hidden prevents content from clipping during the morph
+      */}
+      <motion.div 
+        layout 
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className="max-w-md w-full bg-white p-8 sm:p-10 rounded-[2rem] shadow-xl border border-gray-100 overflow-hidden"
+      >
         
         {/* Logo & Branding */}
         <div className="flex flex-col items-center mb-8">
@@ -119,7 +126,7 @@ export default function LoginPage() {
           </button>
         </form>
 
-      </div>
+      </motion.div>
     </div>
   );
 }
