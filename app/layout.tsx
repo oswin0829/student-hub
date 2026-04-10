@@ -1,10 +1,10 @@
 import { Toaster } from 'sonner';
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google"; // 1. Swapped to a premium geometric font
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import SocialBubbles from "@/components/SocialBubbles"; // 1. Imported the new component
 
-// 2. Configure Jakarta Sans with a variable for global CSS access
 const plusJakartaSans = Plus_Jakarta_Sans({ 
   subsets: ["latin"],
   display: 'swap',
@@ -26,12 +26,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         bg-white 
         selection:bg-blue-100 selection:text-blue-900
       `}>
-        {/* 3. The Toaster stays centered for that premium feedback feel */}
         <Toaster position="top-center" richColors /> 
         
         <Navbar />
+
+        {/* 2. Added Social Bubbles here. They are fixed, so placement in the DOM doesn't matter much */}
+        <SocialBubbles /> 
         
-        {/* Added a relative wrapper to ensure background glows in children don't overflow */}
         <div className="relative">
           {children}
         </div>
