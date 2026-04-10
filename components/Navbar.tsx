@@ -3,22 +3,24 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ShoppingCart, User, LogOut } from 'lucide-react'; // Added LogOut icon
+import { ShoppingCart, User, LogOut } from 'lucide-react'; 
 import { useCartStore } from '@/store/cartStore';
-import { createClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
+// 1. Import and rename the Supabase type to avoid the collision
+import type { User as SupabaseUser } from '@supabase/supabase-js'; 
+import { toast } from 'sonner'; 
 
 // Initialize Supabase Client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);
 
 export default function Navbar() {
   const { cart } = useCartStore();
   const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
   
-  // State to hold the logged-in user
-  const [user, setUser] = useState<any>(null);
-
+  // 2. Use the new renamed type here
+  const [user, setUser] = useState<SupabaseUser | null>(null);
   // Listen for login/logout events
   useEffect(() => {
     // 1. Check if they are logged in on initial load
@@ -35,8 +37,13 @@ export default function Navbar() {
   }, []);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    // No need to redirect, the listener above will instantly update the UI!
+    const { error } = await supabase.auth.signOut();
+    
+    if (error) {
+      toast.error(`Logout failed: ${error.message}`);
+    } else {
+      toast.success("Successfully logged out");
+    }
   };
 
   return (

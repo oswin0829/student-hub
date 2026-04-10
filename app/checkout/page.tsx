@@ -1,12 +1,31 @@
 "use client";
 
+import { useState, useEffect } from 'react'; // 1. Added React hooks
 import { useCartStore } from '@/store/cartStore';
 import { createPayment } from '@/app/actions/checkout';
-import { Trash2, Plus, Minus, ShoppingBag, AlertCircle } from 'lucide-react';
+import { Trash2, Plus, Minus, ShoppingBag, AlertCircle, CheckCircle2 } from 'lucide-react'; // 2. Added CheckCircle2
 import Link from 'next/link';
+import { createBrowserClient } from '@supabase/ssr'; // 3. Added Supabase
+
+// Initialize Supabase Client
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);
 
 export default function CheckoutPage() {
   const { cart, cartTotal, removeFromCart, clearCart, updateQuantity } = useCartStore();
+  
+  // 4. State to hold the verified email
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+
+  // 5. Fetch the session on page load
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user?.email) {
+        setUserEmail(session.user.email);
+      }
+    });
+  }, []);
 
   // Handle Empty State
   if (cart.length === 0) {
@@ -15,7 +34,7 @@ export default function CheckoutPage() {
         <ShoppingBag size={64} className="text-gray-300 mb-6" />
         <h1 className="text-2xl font-black text-slate-900 mb-2">Your cart is empty</h1>
         <p className="text-slate-500 mb-8 text-center max-w-md">
-          Looks like you haven't added any MegaHelper tools to your cart yet.
+          Looks like you have not added any MegaHelper tools to your cart yet.
         </p>
         <Link 
           href="/"
@@ -59,8 +78,6 @@ export default function CheckoutPage() {
                   {/* Left: Info & Variant */}
                   <div className="flex-1">
                     <p className="font-semibold text-slate-900 leading-snug">{item.name}</p>
-                    
-                    {/* The Variant Label Fix */}
                     <p className="text-[10px] font-bold uppercase tracking-widest text-blue-600 mt-1 bg-blue-50 w-fit px-2 py-0.5 rounded-md">
                       {item.variantLabel || item.selectedLabel || "Standard Config"}
                     </p>
@@ -122,17 +139,40 @@ export default function CheckoutPage() {
               <input type="hidden" name="amount" value={cartTotal()} />
               <input type="hidden" name="name" value="MegaHelper Digital Tools Order" />
               
+              {/* --- 6. CONDITIONAL EMAIL SECTION --- */}
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
-                  Email Address (for digital delivery)
+                  Delivery Details
                 </label>
-                <input 
-                  type="email" 
-                  name="email" 
-                  required
-                  placeholder="you@example.com"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all"
-                />
+                
+                {userEmail ? (
+                  // The "Logged In" View
+                  <div className="bg-white border border-gray-200 rounded-xl p-4 flex items-center justify-between shadow-sm">
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">
+                        Digital Delivery To
+                      </span>
+                      <span className="text-base font-bold text-slate-900">
+                        {userEmail}
+                      </span>
+                    </div>
+                    <div className="bg-green-100 text-green-700 text-[10px] font-black px-2 py-1 rounded-full flex items-center gap-1">
+                      <CheckCircle2 size={12} strokeWidth={3} />
+                      VERIFIED
+                    </div>
+                    {/* Hidden input ensures the createPayment action still receives the email! */}
+                    <input type="hidden" name="email" value={userEmail} />
+                  </div>
+                ) : (
+                  // The "Guest" View
+                  <input 
+                    type="email" 
+                    name="email" 
+                    required
+                    placeholder="you@example.com"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all"
+                  />
+                )}
               </div>
 
               {/* Warning/Info Box */}
