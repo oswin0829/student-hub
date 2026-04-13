@@ -48,7 +48,6 @@ export default function CheckoutPage() {
     <main className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         
-        {/* The Upgraded Header Area with Inline Morphing Confirmation */}
         <div className="flex items-center justify-between mb-8 overflow-hidden">
           <h1 className="text-3xl font-black text-slate-900 tracking-tight">Checkout</h1>
           
@@ -181,10 +180,23 @@ export default function CheckoutPage() {
               <input type="hidden" name="amount" value={cartTotal()} />
               <input type="hidden" name="name" value="MegaHelper Digital Tools Order" />
               
+              {/* --- UPGRADED DELIVERY DETAILS SECTION --- */}
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
-                  Delivery Details
-                </label>
+                <div className="flex items-end justify-between mb-2">
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest">
+                    Delivery Details
+                  </label>
+                  
+                  {/* The New Login/Signup Nudge for Guests */}
+                  {!userEmail && (
+                    <Link 
+                      href="/login" 
+                      className="text-[11px] font-black text-blue-600 hover:text-blue-800 transition-colors"
+                    >
+                      Sign In / Create Account
+                    </Link>
+                  )}
+                </div>
                 
                 {userEmail ? (
                   <div className="bg-white border border-gray-200 rounded-xl p-4 flex items-center justify-between shadow-sm">
@@ -203,17 +215,22 @@ export default function CheckoutPage() {
                     <input type="hidden" name="email" value={userEmail} />
                   </div>
                 ) : (
-                  <input 
-                    type="email" 
-                    name="email" 
-                    required
-                    placeholder="you@example.com"
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all"
-                  />
+                  <div className="space-y-2">
+                    <input 
+                      type="email" 
+                      name="email" 
+                      required
+                      placeholder="you@example.com"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all shadow-sm"
+                    />
+                    <p className="text-[10px] font-bold text-slate-400 px-1">
+                      Checking out as a guest. We recommend creating an account to save your tools permanently.
+                    </p>
+                  </div>
                 )}
               </div>
 
-              <div className="flex items-start gap-3 bg-blue-50/50 border border-blue-100 p-4 rounded-xl">
+              <div className="flex items-start gap-3 bg-blue-50/50 border border-blue-100 p-4 rounded-xl mt-4">
                 <AlertCircle size={18} className="text-blue-500 flex-shrink-0 mt-0.5" />
                 <p className="text-sm text-slate-600 leading-relaxed">
                   Secure checkout via Billplz. Your digital product will be sent instantly to the email provided above after successful payment.

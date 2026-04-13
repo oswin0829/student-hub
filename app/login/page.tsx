@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { createBrowserClient } from '@supabase/ssr'; 
 import { toast } from 'sonner';
-import { motion, AnimatePresence } from 'framer-motion'; // <-- Imported AnimatePresence
+import { motion, AnimatePresence } from 'framer-motion';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
@@ -17,7 +17,7 @@ export default function LoginPage() {
   const [authMode, setAuthMode] = useState<AuthMode>('sign_in');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState(''); // <-- Added state for confirmation
+  const [confirmPassword, setConfirmPassword] = useState(''); 
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -41,7 +41,6 @@ export default function LoginPage() {
         router.refresh();
       }
     } else {
-      // Catch password typos before sending to Supabase
       if (password !== confirmPassword) {
         toast.error("Passwords do not match!");
         setLoading(false);
@@ -91,7 +90,7 @@ export default function LoginPage() {
             type="button"
             onClick={() => {
               setAuthMode('sign_up');
-              setConfirmPassword(''); // Clear it when toggling modes
+              setConfirmPassword(''); 
             }}
             className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-300 ${
               authMode === 'sign_up' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-900'
@@ -125,7 +124,6 @@ export default function LoginPage() {
             />
           </div>
 
-          {/* --- THE LIQUID ANIMATION FIELD --- */}
           <AnimatePresence>
             {authMode === 'sign_up' && (
               <motion.div 
@@ -157,6 +155,16 @@ export default function LoginPage() {
             {loading ? 'Processing...' : (authMode === 'sign_in' ? 'Log In' : 'Create Account')}
           </button>
         </form>
+
+        {/* --- THE GUEST ESCAPE HATCH --- */}
+        <div className="mt-8 pt-6 border-t border-gray-100 flex justify-center">
+          <button 
+            onClick={() => router.push('/checkout')}
+            className="text-sm font-bold text-slate-400 hover:text-slate-800 transition-colors"
+          >
+            Continue as Guest
+          </button>
+        </div>
 
       </motion.div>
     </div>

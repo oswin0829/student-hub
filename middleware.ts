@@ -29,31 +29,17 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // 3. Check the active session securely
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // 3. Check the active session securely (Useful for refreshing the cookie)
+  await supabase.auth.getUser();
 
-  // 4. The Security Gate: Redirect to login if unauthenticated
-  if (!user && request.nextUrl.pathname.startsWith('/checkout')) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/login';
-    return NextResponse.redirect(url);
-  }
-
+  // 4. THE GATE IS OPEN: We removed the redirect block that was locking down /checkout.
+  // If you ever build a customer dashboard later, you can add this back to protect '/dashboard' instead!
+  
   return supabaseResponse;
 }
 
-// 5. Tell Next.js exactly which paths this middleware should run on
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
-     */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };
