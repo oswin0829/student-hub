@@ -4,7 +4,19 @@ import { ShoppingCart } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import { toast } from 'sonner';
 
-export default function AddToCartButton({ product }: { product: any }) {
+// Define the shape of the data this button expects
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  category: string;
+  image_url?: string;
+  cartId?: string;      // Optional because it might be generated in the button
+  selectedLabel?: string; 
+  variantLabel?: string;
+}
+
+export default function AddToCartButton({ product }: { product: Product }) {
   const addToCart = useCartStore((state) => state.addToCart);
 
   const handleAddToCart = (e: React.MouseEvent) => {

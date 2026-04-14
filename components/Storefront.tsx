@@ -4,20 +4,35 @@ import { useState, useMemo } from "react";
 import ProductCard from "@/components/ProductCard"; 
 import { motion, AnimatePresence } from "framer-motion";
 
-const CATEGORIES = ["All", "AI Tools", "Educational", "Writing Tools", "Templates"];
+// 1. Strict Type Definitions
+interface ProductOption {
+  id: string;
+  label: string;
+  price: number;
+}
 
-type Product = {
+interface Product {
   id: number;
   name: string;
   price: number;
   category: string;
   image_url: string;
-};
+  options?: ProductOption[];
+}
 
 export default function Storefront({ initialProducts }: { initialProducts: Product[] }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
+  // 2. Dynamic Category Extraction
+  const categories = useMemo(() => {
+    const uniqueCats = Array.from(
+      new Set(initialProducts.map((p) => p.category).filter(Boolean))
+    );
+    return ["All", ...uniqueCats.sort()];
+  }, [initialProducts]);
+
+  // 3. Filter Logic
   const filteredProducts = useMemo(() => {
     return initialProducts.filter((product) => {
       const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -27,29 +42,28 @@ export default function Storefront({ initialProducts }: { initialProducts: Produ
   }, [initialProducts, searchQuery, selectedCategory]);
 
   return (
-    /* 1. Expanded container to match the Navbar's wide reach */
     <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-12 py-12">
       
-      {/* 2. Enhanced Control Panel - Now using space-between for maximum horizontal reach */}
+      {/* --- Control Panel --- */}
       <div className="flex flex-col lg:flex-row gap-8 items-center justify-between mb-16">
         
-        {/* Wider Search Bar: Shifted from md:w-96 to lg:max-w-xl to fill the 'dead space' */}
+        {/* Search Bar */}
         <div className="relative w-full lg:max-w-xl group">
           <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none transition-colors group-focus-within:text-blue-500">
             <span className="text-gray-400 text-xl">🔍</span>
           </div>
           <input
             type="text"
-            className="block w-full pl-14 pr-6 py-4.5 border border-gray-100 rounded-2xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all shadow-sm hover:border-gray-200"
+            className="block w-full pl-14 pr-6 py-4.5 border border-gray-100 rounded-2xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all shadow-sm hover:border-gray-200 text-slate-900"
             placeholder="Search for digital tools..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
 
-        {/* Category Pills - Now with better spacing and shadows */}
+        {/* Category Pills */}
         <div className="flex gap-3 overflow-x-auto w-full lg:w-auto pb-4 lg:pb-0 hide-scrollbar justify-center lg:justify-end">
-          {CATEGORIES.map((category) => (
+          {categories.map((category) => (
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}
@@ -65,16 +79,15 @@ export default function Storefront({ initialProducts }: { initialProducts: Produ
         </div>
       </div>
 
-      {/* 3. High-Density Product Grid: Up to 6 columns on large screens */}
+      {/* --- Product Grid --- */}
       <div className="min-h-[500px]">
         <AnimatePresence mode="popLayout">
           {filteredProducts.length > 0 ? (
-                <motion.div 
-                layout
-                /* 1. Changed grid-cols-1 to grid-cols-2 
-                    2. Changed gap-8 to gap-3 (mobile) and gap-6+ (desktop) */
-                className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-8"
-                >
+            <motion.div 
+              key="product-grid"
+              layout
+              className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-8"
+            >
               {filteredProducts.map((product, index) => (
                 <motion.div
                   key={product.id}
@@ -84,7 +97,7 @@ export default function Storefront({ initialProducts }: { initialProducts: Produ
                   exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
                   transition={{ 
                     duration: 0.5, 
-                    delay: index * 0.03, // Slightly faster stagger for high-density grids
+                    delay: index * 0.01, 
                     ease: [0.22, 1, 0.36, 1] 
                   }}
                 >
@@ -93,10 +106,11 @@ export default function Storefront({ initialProducts }: { initialProducts: Produ
               ))}
             </motion.div>
           ) : (
-            /* 4. Wide-Format Empty State */
             <motion.div 
+              key="empty-state"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95 }}
               className="w-full py-32 flex flex-col items-center justify-center bg-white rounded-[2rem] border border-gray-50 shadow-sm"
             >
               <div className="bg-gray-50 p-8 rounded-full mb-6">
