@@ -44,7 +44,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             </p>
 
             {/* --- THIS HANDLES THE VARIANT LOGIC NOW --- */}
-            <ProductInteraction product={product} createPayment={createPayment} />
+            <ProductInteraction product={product} />
             
             {/* Trust Badges */}
             <div className="mt-12 grid grid-cols-2 gap-4 border-t border-gray-100 pt-8">
