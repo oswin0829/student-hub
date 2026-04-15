@@ -8,3 +8,25 @@
 .animate-gradient {
   animation: gradient 8s linear infinite;
 }
+
+@layer utilities {
+  /* Custom thin scrollbar for categories */
+  .custom-scrollbar::-webkit-scrollbar {
+    height: 5px; /* Height for horizontal scrollbar */
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f5f9; /* slate-100 */
+    border-radius: 10px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1; /* slate-300 */
+    border-radius: 10px;
+    transition: all 0.3s ease;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #2563eb; /* blue-600 - highlights when they use it */
+  }
+}
