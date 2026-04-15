@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Save, Package, DollarSign, ArrowLeft, Tag, Plus, Trash2, Hash, AlertCircle } from 'lucide-react';
+import { Save, Package, DollarSign, ArrowLeft, Tag, Plus, Trash2, Hash, AlertCircle, AlignLeft } from 'lucide-react';
 import Link from 'next/link';
 
 const supabase = createBrowserClient(
@@ -26,6 +26,7 @@ export default function EditProductPage() {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [category, setCategory] = useState(''); 
+  const [description, setDescription] = useState(''); // NEW: Description State
   const [options, setOptions] = useState<ProductOption[]>([]);
 
   const [existingImageUrl, setExistingImageUrl] = useState('');
@@ -38,6 +39,7 @@ export default function EditProductPage() {
         setName(data.name || '');
         setPrice(data.price?.toString() || '0');
         setCategory(data.category || ''); 
+        setDescription(data.description || ''); // NEW: Fetch existing description
         setOptions(data.options || []);   
         setExistingImageUrl(data.image_url || '');
       } else if (error) {
@@ -87,9 +89,17 @@ export default function EditProductPage() {
         finalImageUrl = data.publicUrl;
       }
 
+      // Updated to include 'description'
       const { error: dbError } = await supabase
         .from('products')
-        .update({ name, price: parseFloat(price), category, options, image_url: finalImageUrl })
+        .update({ 
+          name, 
+          price: parseFloat(price), 
+          category, 
+          description, // NEW: Update description
+          options, 
+          image_url: finalImageUrl 
+        })
         .eq('id', productId);
       
       if (dbError) throw dbError;
@@ -102,9 +112,6 @@ export default function EditProductPage() {
       let errorMessage = "An unknown error occurred";
       if (error instanceof Error) {
         errorMessage = error.message;
-      } else if (typeof error === 'object' && error !== null) {
-        const errObj = error as Record<string, unknown>;
-        if (typeof errObj.message === 'string') errorMessage = errObj.message;
       }
       toast.error(`Update failed: ${errorMessage}`, { id: toastId });
     } finally {
@@ -112,9 +119,7 @@ export default function EditProductPage() {
     }
   };
 
-  // --- NEW DELETE LOGIC ---
   const handleDelete = async () => {
-    // Standard browser confirmation dialog prevents accidental clicks!
     if (!window.confirm("Are you absolutely sure you want to delete this product? This action cannot be undone.")) {
       return; 
     }
@@ -172,6 +177,21 @@ export default function EditProductPage() {
               </label>
               <input type="number" step="0.01" required value={price} onChange={e => setPrice(e.target.value)} className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-600 outline-none" />
             </div>
+
+            {/* NEW: DESCRIPTION FIELD */}
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                <AlignLeft size={14} /> Description
+              </label>
+              <textarea 
+                required 
+                rows={4} 
+                value={description} 
+                onChange={e => setDescription(e.target.value)} 
+                placeholder="Explain the features and usage of this tool..."
+                className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-600 outline-none resize-none" 
+              />
+            </div>
           </div>
 
           {/* Variant Builder */}
@@ -192,7 +212,7 @@ export default function EditProductPage() {
                   <motion.div key={index} initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="flex flex-col sm:flex-row items-end gap-3 bg-white p-4 rounded-xl border border-gray-200 shadow-sm mt-2">
                     <div className="flex flex-col w-full sm:w-[25%]">
                       <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 pl-1">Variant ID</label>
-                      <div className="flex items-center gap-2 bg-slate-50 border border-gray-100 rounded-lg p-2.5 focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-400 transition-all">
+                      <div className="flex items-center gap-2 bg-slate-50 border border-gray-100 rounded-lg p-2.5">
                         <Hash size={14} className="text-slate-400 shrink-0" />
                         <input type="text" placeholder="e.g. 1m" value={opt.id} onChange={(e) => handleUpdateOption(index, 'id', e.target.value)} className="w-full text-sm outline-none bg-transparent font-mono text-slate-700" />
                       </div>
@@ -200,28 +220,23 @@ export default function EditProductPage() {
                     
                     <div className="flex flex-col w-full sm:flex-1">
                       <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 pl-1">Display Label</label>
-                      <input type="text" placeholder="e.g. 1 Month Access" value={opt.label} onChange={(e) => handleUpdateOption(index, 'label', e.target.value)} className="w-full text-sm outline-none bg-slate-50 border border-gray-100 rounded-lg p-2.5 font-semibold text-slate-700 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all" />
+                      <input type="text" placeholder="e.g. 1 Month Access" value={opt.label} onChange={(e) => handleUpdateOption(index, 'label', e.target.value)} className="w-full text-sm outline-none bg-slate-50 border border-gray-100 rounded-lg p-2.5 font-semibold text-slate-700" />
                     </div>
                     
                     <div className="flex flex-col w-full sm:w-[25%]">
                       <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 pl-1">Price</label>
-                      <div className="flex items-center gap-2 bg-slate-50 border border-gray-100 rounded-lg p-2.5 focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-400 transition-all">
+                      <div className="flex items-center gap-2 bg-slate-50 border border-gray-100 rounded-lg p-2.5">
                         <span className="text-xs font-bold text-slate-400">RM</span>
                         <input type="number" placeholder="10.00" value={opt.price} onChange={(e) => handleUpdateOption(index, 'price', parseFloat(e.target.value) || 0)} className="w-full text-sm outline-none bg-transparent font-mono text-slate-700" />
                       </div>
                     </div>
                     
-                    <button type="button" onClick={() => handleRemoveOption(index)} className="p-2.5 bg-white border border-gray-200 text-slate-400 hover:text-red-500 hover:bg-red-50 hover:border-red-100 rounded-lg shadow-sm transition-all w-full sm:w-auto flex justify-center items-center h-[42px]">
+                    <button type="button" onClick={() => handleRemoveOption(index)} className="p-2.5 bg-white border border-gray-200 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg shadow-sm transition-all w-full sm:w-auto flex justify-center items-center h-[42px]">
                       <Trash2 size={16} />
                     </button>
                   </motion.div>
                 ))}
               </AnimatePresence>
-              {options.length === 0 && (
-                <div className="text-center py-6 text-xs font-bold text-slate-400 uppercase tracking-widest border-2 border-dashed border-slate-200 rounded-xl bg-white">
-                  No Variants Added
-                </div>
-              )}
             </div>
           </div>
 
@@ -262,7 +277,7 @@ export default function EditProductPage() {
           </button>
         </form>
 
-        {/* --- DANGER ZONE --- */}
+        {/* Danger Zone */}
         <div className="mt-12 pt-8 border-t border-red-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h3 className="text-sm font-bold text-red-600 flex items-center gap-2">
@@ -279,7 +294,6 @@ export default function EditProductPage() {
             <Trash2 size={16} /> Delete Product
           </button>
         </div>
-
       </motion.div>
     </div>
   );

@@ -15,9 +15,10 @@ interface ProductOption {
 interface Product {
   id: number;
   name: string;
-  price: number;
+  price: number; 
   category: string;
   image_url?: string;
+  description?: string; // Add this line!
   options?: ProductOption[];
 }
 

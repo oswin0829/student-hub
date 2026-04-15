@@ -18,6 +18,7 @@ interface Product {
   price: number; 
   category: string;
   image_url?: string;
+  description?: string; // Add this line!
   options?: ProductOption[];
 }
 
