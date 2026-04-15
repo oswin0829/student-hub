@@ -56,7 +56,8 @@ export default function ProductCard({ product }: { product: Product }) {
       price: selectedOption ? selectedOption.price : product.price,
       variantLabel: selectedOption ? selectedOption.label : "Standard",
       // Unique ID for the cart: combines product ID and option ID
-      cartId: selectedOption ? `${product.id}-${selectedOption.id}` : `${product.id}`
+      cartId: selectedOption ? `${product.id}-${selectedOption.id}` : `${product.id}`,
+      quantity: 1
     };
 
     addToCart(itemToAdd);
