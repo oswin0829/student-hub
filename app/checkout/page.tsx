@@ -7,6 +7,7 @@ import { Trash2, Plus, Minus, ShoppingBag, AlertCircle, CheckCircle2 } from 'luc
 import Link from 'next/link';
 import { createBrowserClient } from '@supabase/ssr'; 
 import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
@@ -129,20 +130,32 @@ export default function CheckoutPage() {
 
                     <div className="flex items-center justify-between sm:justify-end gap-6 sm:gap-8">
                       
+                      {/* --- QUANTITY CONTROLS --- */}
                       <div className="flex items-center border border-gray-200 rounded-lg bg-gray-50/50 p-1">
                         <button 
+                          type="button"
                           onClick={() => updateQuantity(item.cartId, item.quantity - 1)}
-                          className="p-1.5 text-gray-400 hover:text-gray-900 hover:bg-white rounded transition-colors"
+                          className="p-1.5 text-gray-400 hover:text-gray-900 hover:bg-white rounded transition-colors disabled:opacity-30"
                           disabled={item.quantity <= 1}
                         >
                           <Minus size={14} strokeWidth={3} />
                         </button>
+                        
                         <span className="w-8 text-center font-mono font-bold text-sm text-slate-900">
                           {item.quantity}
                         </span>
+                        
                         <button 
-                          onClick={() => updateQuantity(item.cartId, item.quantity + 1)}
-                          className="p-1.5 text-gray-400 hover:text-gray-900 hover:bg-white rounded transition-colors"
+                          type="button"
+                          onClick={() => {
+                            if (item.quantity < 1000) {
+                                updateQuantity(item.cartId, item.quantity + 1);
+                            } else {
+                                toast.error("Maximum limit reached");
+                            }
+                          }}
+                          className="p-1.5 text-gray-400 hover:text-gray-900 hover:bg-white rounded transition-colors disabled:opacity-30"
+                          disabled={item.quantity >= 1000}
                         >
                           <Plus size={14} strokeWidth={3} />
                         </button>
@@ -180,14 +193,12 @@ export default function CheckoutPage() {
               <input type="hidden" name="amount" value={cartTotal()} />
               <input type="hidden" name="name" value="MegaHelper Digital Tools Order" />
               
-              {/* --- UPGRADED DELIVERY DETAILS SECTION --- */}
               <div>
                 <div className="flex items-end justify-between mb-2">
                   <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest">
                     Delivery Details
                   </label>
                   
-                  {/* The New Login/Signup Nudge for Guests */}
                   {!userEmail && (
                     <Link 
                       href="/login" 

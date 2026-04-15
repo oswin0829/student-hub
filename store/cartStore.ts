@@ -64,11 +64,16 @@ export const useCartStore = create<CartStore>((set, get) => ({
     }));
   },
 
+
   updateQuantity: (cartId, quantity) => {
     set((state) => ({
       cart: state.cart.map((item) =>
         item.cartId === cartId 
-          ? { ...item, quantity: Math.max(1, quantity) } 
+          ? { 
+              ...item, 
+              // Ensures quantity is at least 1 and at most 1000
+              quantity: Math.max(1, Math.min(1000, quantity)) 
+            } 
           : item
       ),
     }));

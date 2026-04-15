@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { Check, Minus, Plus } from 'lucide-react'; // Added Minus and Plus
+import { Check, Minus, Plus } from 'lucide-react';
 import AddToCartButton from '@/components/AddToCartButton';
 import { toast } from 'sonner';
 
@@ -20,7 +20,7 @@ interface Product {
   image_url?: string;
   description?: string;
   options?: ProductOption[];
-  quantity?: number; // <--- ADD THIS LINE (make sure it's optional with the ?)
+  quantity?: number;
 }
 
 interface ProductInteractionProps {
@@ -29,7 +29,7 @@ interface ProductInteractionProps {
 
 export default function ProductInteraction({ product }: ProductInteractionProps) {
   const [selectedOption, setSelectedOption] = useState<ProductOption | null>(null);
-  const [quantity, setQuantity] = useState(1); // Added Quantity State
+  const [quantity, setQuantity] = useState(1);
 
   const hasOptions = product.options && product.options.length > 0;
   const currentPrice = selectedOption ? selectedOption.price : product.price;
@@ -55,7 +55,7 @@ export default function ProductInteraction({ product }: ProductInteractionProps)
   return (
     <div className="flex flex-col gap-8">
       
-      {/* 1. Dynamic Price Display - Now multiplied by quantity */}
+      {/* 1. Dynamic Price Display */}
       <div className="flex flex-col gap-1">
         {selectedOption ? (
           <div className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter transition-all">
@@ -109,38 +109,65 @@ export default function ProductInteraction({ product }: ProductInteractionProps)
         </div>
       )}
 
-      {/* --- 2.5 Quantity Selector Block --- */}
+      {/* 3. Typable Quantity Selector with 1000 Max Cap */}
       <div className="space-y-3">
         <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Quantity</p>
-        <div className="flex items-center gap-4 bg-gray-50 w-fit p-2 rounded-2xl border border-gray-100">
-          <button 
-            type="button"
-            onClick={() => setQuantity(Math.max(1, quantity - 1))}
-            className="w-10 h-10 flex items-center justify-center bg-white rounded-xl border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-90"
-          >
-            <Minus size={18} />
-          </button>
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-4 bg-gray-50 w-fit p-2 rounded-2xl border border-gray-100">
+            <button 
+              type="button"
+              onClick={() => setQuantity(Math.max(1, quantity - 1))}
+              className="w-10 h-10 flex items-center justify-center bg-white rounded-xl border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-90"
+            >
+              <Minus size={18} />
+            </button>
+            
+            <input
+              type="number"
+              min="1"
+              max="1000"
+              value={quantity === 0 ? "" : quantity}
+              onChange={(e) => {
+                const val = parseInt(e.target.value);
+                if (isNaN(val)) {
+                  setQuantity(0); 
+                } else {
+                  // Capped between 1 and 1000
+                  setQuantity(Math.min(1000, Math.max(1, val)));
+                }
+              }}
+              onBlur={() => {
+                if (quantity < 1) setQuantity(1); 
+              }}
+              className="w-16 text-center font-bold text-gray-900 bg-transparent outline-none text-lg [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
+            
+            <button 
+              type="button"
+              onClick={() => setQuantity(Math.min(1000, quantity + 1))}
+              className="w-10 h-10 flex items-center justify-center bg-white rounded-xl border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-90"
+            >
+              <Plus size={18} />
+            </button>
+          </div>
           
-          <span className="w-8 text-center font-bold text-gray-900 text-lg">{quantity}</span>
-          
-          <button 
-            type="button"
-            onClick={() => setQuantity(quantity + 1)}
-            className="w-10 h-10 flex items-center justify-center bg-white rounded-xl border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-90"
-          >
-            <Plus size={18} />
-          </button>
+          {/* Max Limit Warning */}
+          {quantity === 1000 && (
+            <p className="text-[10px] font-bold text-blue-500 uppercase tracking-tight animate-pulse">
+              Maximum order limit reached
+            </p>
+          )}
         </div>
       </div>
 
-      {/* 3. Single Action: Add to Cart */}
+      {/* 4. Action: Add to Cart */}
       <div className="pt-2">
         <div onClickCapture={handleCartValidation}>
           <AddToCartButton 
             product={{
               ...product,
               price: currentPrice,
-              quantity: quantity, // Passing quantity to the cart
+              quantity: quantity,
               selectedLabel: selectedOption?.label,
               cartId: selectedOption ? `${product.id}-${selectedOption.id}` : `${product.id}`
             }} 
