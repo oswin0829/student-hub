@@ -27,7 +27,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
   const addToCart = useCartStore((state) => state.addToCart);
 
-  // Calculate the price range
+  // Calculate the price range for display
   const allPrices = product.options && product.options.length > 0 
     ? [product.price, ...product.options.map(opt => opt.price)]
     : [product.price];
@@ -37,29 +37,29 @@ export default function ProductCard({ product }: { product: Product }) {
   const isRange = minPrice !== maxPrice;
 
   const handleAdd = (e: React.MouseEvent) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevents the Link from triggering
     
-    // --- NEW: UX Validation Gate ---
     const hasOptions = product.options && product.options.length > 0;
     
+    // UX Validation: If it has options, one MUST be selected
     if (hasOptions && !selectedOption) {
-      toast.error(`Please select an option for ${product.name}`, {
+      toast.error(`Please select a plan for ${product.name}`, {
         duration: 3000,
         icon: '⚠️'
       });
-      return; // Stop execution here
+      return;
     }
-    // -------------------------------
     
     const itemToAdd = {
       ...product,
       price: selectedOption ? selectedOption.price : product.price,
       variantLabel: selectedOption ? selectedOption.label : "Standard",
+      // Unique ID for the cart: combines product ID and option ID
       cartId: selectedOption ? `${product.id}-${selectedOption.id}` : `${product.id}`
     };
 
     addToCart(itemToAdd);
-    toast.success(`Added ${product.name} (${selectedOption?.label || 'Standard'})`);
+    toast.success(`Added to cart: ${product.name} ${selectedOption ? `(${selectedOption.label})` : ''}`);
   };
 
   return (
@@ -99,13 +99,17 @@ export default function ProductCard({ product }: { product: Product }) {
           </h3>
         </Link>
 
-        {/* Variant Selection Pills */}
+        {/* Variant Selection Pills - FIXED: Unique Keys */}
         {product.options && product.options.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mb-4 mt-1">
-            {product.options.map((option) => (
+            {product.options.map((option, index) => (
               <button
-                key={option.id}
-                onClick={() => setSelectedOption(option)}
+                key={`${option.id}-${index}`} // Combined ID and index to ensure uniqueness
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setSelectedOption(option);
+                }}
                 className={`text-[9px] font-bold px-2 py-1 rounded-md border transition-all ${
                   selectedOption?.id === option.id
                     ? "bg-blue-600 border-blue-600 text-white shadow-sm"
@@ -124,7 +128,6 @@ export default function ProductCard({ product }: { product: Product }) {
             <div className="flex items-baseline gap-1">
               <span className="text-[10px] md:text-xs font-bold text-slate-400 font-mono">RM</span>
               
-              {/* Logic: Show selected price OR range OR base price */}
               {selectedOption ? (
                  <span className="text-lg md:text-2xl font-black text-slate-900 tracking-tighter">
                    {selectedOption.price.toFixed(2)}
@@ -140,21 +143,20 @@ export default function ProductCard({ product }: { product: Product }) {
               )}
             </div>
             
-            {/* Helper text when a range is displayed */}
             {!selectedOption && isRange && (
               <span className="text-[8px] uppercase font-bold text-blue-500/60 tracking-widest mt-0.5">
-                Multiple Options
+                Multiple Options Available
               </span>
             )}
           </div>
           
           <button 
+            type="button"
             onClick={handleAdd}
-            className="w-full bg-blue-600 text-white py-2.5 md:py-3 rounded-lg md:rounded-xl text-xs md:text-sm font-bold hover:bg-blue-700 transition-all active:scale-95 flex items-center justify-center gap-2"
+            className="w-full bg-blue-600 text-white py-2.5 md:py-3 rounded-lg md:rounded-xl text-xs md:text-sm font-bold hover:bg-blue-700 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm"
           >
             <ShoppingCart size={16} strokeWidth={2.5} />
-            <span className="hidden xs:inline">Add to Cart</span>
-            <span className="xs:hidden">Add</span>
+            <span className="xs:inline">Add to Cart</span>
           </button>
         </div>
       </div>
