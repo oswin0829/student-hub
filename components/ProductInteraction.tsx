@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { Check } from 'lucide-react';
+import { Check, Minus, Plus } from 'lucide-react'; // Added Minus and Plus
 import AddToCartButton from '@/components/AddToCartButton';
 import { toast } from 'sonner';
 
@@ -18,8 +18,9 @@ interface Product {
   price: number; 
   category: string;
   image_url?: string;
-  description?: string; // Add this line!
+  description?: string;
   options?: ProductOption[];
+  quantity?: number; // <--- ADD THIS LINE (make sure it's optional with the ?)
 }
 
 interface ProductInteractionProps {
@@ -28,6 +29,7 @@ interface ProductInteractionProps {
 
 export default function ProductInteraction({ product }: ProductInteractionProps) {
   const [selectedOption, setSelectedOption] = useState<ProductOption | null>(null);
+  const [quantity, setQuantity] = useState(1); // Added Quantity State
 
   const hasOptions = product.options && product.options.length > 0;
   const currentPrice = selectedOption ? selectedOption.price : product.price;
@@ -53,19 +55,19 @@ export default function ProductInteraction({ product }: ProductInteractionProps)
   return (
     <div className="flex flex-col gap-8">
       
-      {/* 1. Dynamic Price Display */}
+      {/* 1. Dynamic Price Display - Now multiplied by quantity */}
       <div className="flex flex-col gap-1">
         {selectedOption ? (
           <div className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter transition-all">
-            RM{selectedOption.price.toFixed(2)}
+            RM{(selectedOption.price * quantity).toFixed(2)}
           </div>
         ) : isRange ? (
           <div className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter">
-            RM{minPrice.toFixed(2)} — {maxPrice.toFixed(2)}
+            RM{(minPrice * quantity).toFixed(2)} — {(maxPrice * quantity).toFixed(2)}
           </div>
         ) : (
           <div className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
-            RM{product.price.toFixed(2)}
+            RM{(product.price * quantity).toFixed(2)}
           </div>
         )}
         
@@ -107,6 +109,30 @@ export default function ProductInteraction({ product }: ProductInteractionProps)
         </div>
       )}
 
+      {/* --- 2.5 Quantity Selector Block --- */}
+      <div className="space-y-3">
+        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Quantity</p>
+        <div className="flex items-center gap-4 bg-gray-50 w-fit p-2 rounded-2xl border border-gray-100">
+          <button 
+            type="button"
+            onClick={() => setQuantity(Math.max(1, quantity - 1))}
+            className="w-10 h-10 flex items-center justify-center bg-white rounded-xl border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-90"
+          >
+            <Minus size={18} />
+          </button>
+          
+          <span className="w-8 text-center font-bold text-gray-900 text-lg">{quantity}</span>
+          
+          <button 
+            type="button"
+            onClick={() => setQuantity(quantity + 1)}
+            className="w-10 h-10 flex items-center justify-center bg-white rounded-xl border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-90"
+          >
+            <Plus size={18} />
+          </button>
+        </div>
+      </div>
+
       {/* 3. Single Action: Add to Cart */}
       <div className="pt-2">
         <div onClickCapture={handleCartValidation}>
@@ -114,8 +140,8 @@ export default function ProductInteraction({ product }: ProductInteractionProps)
             product={{
               ...product,
               price: currentPrice,
+              quantity: quantity, // Passing quantity to the cart
               selectedLabel: selectedOption?.label,
-              // Unique ID for the cart to distinguish between different variants of same product
               cartId: selectedOption ? `${product.id}-${selectedOption.id}` : `${product.id}`
             }} 
           />

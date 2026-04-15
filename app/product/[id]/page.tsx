@@ -39,7 +39,8 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             </div>
             
             {/* Product Title */}
-            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 leading-tight tracking-tight">
+            {/* Find your h1 tag and update the classes */}
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 leading-tight tracking-tight">
               {product.name}
             </h1>
             

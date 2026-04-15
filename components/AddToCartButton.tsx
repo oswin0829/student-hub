@@ -14,6 +14,7 @@ interface Product {
   cartId?: string;      // Optional because it might be generated in the button
   selectedLabel?: string; 
   variantLabel?: string;
+  quantity?: number;
 }
 
 export default function AddToCartButton({ product }: { product: Product }) {
