@@ -6,6 +6,7 @@ import { Package, Clock, CheckCircle2, ChevronRight, ShoppingBag, ArrowLeft } fr
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
@@ -88,8 +89,10 @@ export default function OrdersPage() {
         );
 
         setOrders(groupedArray);
-      } catch (err) {
-        console.error("Error fetching orders:", err);
+      } catch (err: any) {
+        console.error("Full error object:", err);
+        const errorMessage = err?.message || err?.details || "Failed to fetch orders";
+        toast.error(`Error: ${errorMessage}`);
       } finally {
         setLoading(false);
       }
