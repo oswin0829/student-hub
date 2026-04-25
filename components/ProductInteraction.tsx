@@ -58,21 +58,21 @@ export default function ProductInteraction({ product }: ProductInteractionProps)
       {/* 1. Dynamic Price Display */}
       <div className="flex flex-col gap-1">
         {selectedOption ? (
-          <div className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter transition-all">
+          <div className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white tracking-tighter transition-all">
             RM{(selectedOption.price * quantity).toFixed(2)}
           </div>
         ) : isRange ? (
-          <div className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter">
+          <div className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tighter">
             RM{(minPrice * quantity).toFixed(2)} — {(maxPrice * quantity).toFixed(2)}
           </div>
         ) : (
-          <div className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
+          <div className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white tracking-tighter">
             RM{(product.price * quantity).toFixed(2)}
           </div>
         )}
         
         {!selectedOption && isRange && (
-          <span className="text-sm font-bold text-blue-500 tracking-widest uppercase mt-2">
+          <span className="text-sm font-bold text-gray-500 tracking-widest uppercase mt-2">
             Select an option below
           </span>
         )}
@@ -90,19 +90,19 @@ export default function ProductInteraction({ product }: ProductInteractionProps)
                 onClick={() => setSelectedOption(option)}
                 className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all ${
                   selectedOption?.id === option.id
-                    ? "border-blue-600 bg-blue-50/50 shadow-sm"
-                    : "border-gray-100 bg-white hover:border-gray-300"
+                    ? "border-black dark:border-white bg-gray-50 dark:bg-gray-800 shadow-sm"
+                    : "border-gray-100 dark:border-gray-800 bg-white dark:bg-black hover:border-gray-300 dark:hover:border-gray-600"
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
-                    selectedOption?.id === option.id ? "border-blue-600 bg-blue-600" : "border-gray-300"
+                    selectedOption?.id === option.id ? "border-black dark:border-white bg-black dark:bg-white" : "border-gray-300 dark:border-gray-700"
                   }`}>
-                    {selectedOption?.id === option.id && <Check size={12} className="text-white" strokeWidth={4} />}
+                    {selectedOption?.id === option.id && <Check size={12} className="text-white dark:text-black" strokeWidth={4} />}
                   </div>
-                  <span className="font-bold text-gray-700">{option.label}</span>
+                  <span className="font-bold text-gray-700 dark:text-gray-300">{option.label}</span>
                 </div>
-                <span className="font-mono font-bold text-gray-900">RM{option.price.toFixed(2)}</span>
+                <span className="font-mono font-bold text-gray-900 dark:text-white">RM{option.price.toFixed(2)}</span>
               </button>
             ))}
           </div>
@@ -113,11 +113,11 @@ export default function ProductInteraction({ product }: ProductInteractionProps)
       <div className="space-y-3">
         <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Quantity</p>
         <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-4 bg-gray-50 w-fit p-2 rounded-2xl border border-gray-100">
+          <div className="flex items-center gap-4 bg-gray-50 dark:bg-gray-900 w-fit p-2 rounded-2xl border border-gray-100 dark:border-gray-800">
             <button 
               type="button"
               onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              className="w-10 h-10 flex items-center justify-center bg-white rounded-xl border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-90"
+              className="w-10 h-10 flex items-center justify-center bg-white dark:bg-black rounded-xl border border-gray-200 dark:border-gray-800 text-gray-500 hover:text-black dark:hover:text-white hover:border-gray-300 dark:hover:border-gray-600 transition-all active:scale-90"
             >
               <Minus size={18} />
             </button>
@@ -139,13 +139,13 @@ export default function ProductInteraction({ product }: ProductInteractionProps)
               onBlur={() => {
                 if (quantity < 1) setQuantity(1); 
               }}
-              className="w-16 text-center font-bold text-gray-900 bg-transparent outline-none text-lg [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="w-16 text-center font-bold text-gray-900 dark:text-white bg-transparent outline-none text-lg [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
             
             <button 
               type="button"
               onClick={() => setQuantity(Math.min(1000, quantity + 1))}
-              className="w-10 h-10 flex items-center justify-center bg-white rounded-xl border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-90"
+              className="w-10 h-10 flex items-center justify-center bg-white dark:bg-black rounded-xl border border-gray-200 dark:border-gray-800 text-gray-500 hover:text-black dark:hover:text-white hover:border-gray-300 dark:hover:border-gray-600 transition-all active:scale-90"
             >
               <Plus size={18} />
             </button>
@@ -153,7 +153,7 @@ export default function ProductInteraction({ product }: ProductInteractionProps)
           
           {/* Max Limit Warning */}
           {quantity === 1000 && (
-            <p className="text-[10px] font-bold text-blue-500 uppercase tracking-tight animate-pulse">
+            <p className="text-[10px] font-bold text-black dark:text-white uppercase tracking-tight animate-pulse">
               Maximum order limit reached
             </p>
           )}

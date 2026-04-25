@@ -10,6 +10,8 @@ import type { User as SupabaseUser } from '@supabase/supabase-js';
 import { toast } from 'sonner'; 
 import { motion, AnimatePresence } from 'framer-motion'; // <-- Imported Framer Motion
 
+import { ThemeToggle } from '@/components/ThemeToggle';
+
 // Initialize Supabase Client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
@@ -46,7 +48,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-[100] w-full border-b border-gray-100 bg-white/80 backdrop-blur-xl">
+    <nav className="sticky top-0 z-[100] w-full border-b border-gray-100 dark:border-gray-800 bg-white/80 dark:bg-black/80 backdrop-blur-xl">
       <div className="max-w-[1600px] mx-auto px-6 lg:px-12">
         <div className="flex justify-between items-center h-20">
           
@@ -56,29 +58,31 @@ export default function Navbar() {
               <Image src="/logo.png" alt="MegaHelper Store Logo" fill className="object-contain" priority />
             </div>
             <div className="flex flex-col">
-              <span className="text-2xl font-black text-gray-900 leading-none tracking-tighter">
+              <span className="text-2xl font-black text-gray-900 dark:text-white leading-none tracking-tighter">
                 MĒGA HELPER
               </span>
-              <span className="text-[10px] font-bold uppercase text-blue-600 tracking-[0.3em] -mt-0.5">
+              <span className="text-[10px] font-bold uppercase text-black dark:text-white tracking-[0.3em] -mt-0.5">
                 Digital Assets
               </span>
             </div>
           </Link>
 
           {/* --- ACTIONS SECTION --- */}
-          <div className="flex items-center gap-6 md:gap-8">
+          <div className="flex items-center gap-4 md:gap-6">
             
+            <ThemeToggle />
+
             {user ? (
               // The User Pill Container
-              <div className="flex items-center gap-3 bg-gray-50 p-1.5 pr-2 rounded-full border border-gray-100 overflow-hidden">
+              <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-900 p-1.5 pr-2 rounded-full border border-gray-100 dark:border-gray-800 overflow-hidden">
                 
                 {/* User Avatar Circle */}
-                <div className="w-7 h-7 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold uppercase shrink-0">
+                <div className="w-7 h-7 bg-black dark:bg-white text-white dark:text-black rounded-full flex items-center justify-center text-xs font-bold uppercase shrink-0">
                   {user.email?.charAt(0)}
                 </div>
                 
                 {/* User Email */}
-                <span className="hidden md:block text-sm font-bold text-slate-700 max-w-[120px] truncate pl-1">
+                <span className="hidden md:block text-sm font-bold text-slate-700 dark:text-slate-300 max-w-[120px] truncate pl-1">
                   {user.email}
                 </span>
 
@@ -92,11 +96,11 @@ export default function Navbar() {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: 20 }}
                         transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                        className="flex items-center gap-1.5 pl-2 border-l border-gray-200 ml-1"
+                        className="flex items-center gap-1.5 pl-2 border-l border-gray-200 dark:border-gray-700 ml-1"
                       >
                         <button
                           onClick={() => setIsConfirmingLogout(false)}
-                          className="text-[11px] font-bold text-slate-500 hover:text-slate-800 px-2 py-1 rounded transition-colors"
+                          className="text-[11px] font-bold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 px-2 py-1 rounded transition-colors"
                         >
                           Cancel
                         </button>
@@ -118,7 +122,7 @@ export default function Navbar() {
                         exit={{ opacity: 0, x: -20 }}
                         transition={{ type: "spring", stiffness: 400, damping: 30 }}
                         onClick={() => setIsConfirmingLogout(true)}
-                        className="p-1 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all ml-1"
+                        className="p-1 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full transition-all ml-1"
                         title="Logout"
                       >
                         <LogOut size={16} strokeWidth={2.5} />
@@ -131,7 +135,7 @@ export default function Navbar() {
             ) : (
               <Link 
                 href="/login" 
-                className="flex items-center gap-2 text-base font-bold text-gray-500 hover:text-blue-600 transition-colors group"
+                className="flex items-center gap-2 text-base font-bold text-gray-500 hover:text-black dark:hover:text-white transition-colors group"
               >
                 <User size={22} strokeWidth={2.5} className="group-hover:translate-y-[-1px] transition-transform" />
                 <span className="hidden md:block">Login</span>
@@ -141,11 +145,11 @@ export default function Navbar() {
             {/* Cart Icon */}
             <Link 
               href="/checkout" 
-              className="relative p-2 text-gray-700 hover:text-blue-600 transition-all active:scale-90"
+              className="relative p-2 text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-all active:scale-90"
             >
               <ShoppingCart size={28} strokeWidth={2.5} />
               {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[11px] font-black h-6 w-6 rounded-full flex items-center justify-center border-2 border-white shadow-md animate-in zoom-in duration-300">
+                <span className="absolute -top-1 -right-1 bg-black dark:bg-white text-white dark:text-black text-[11px] font-black h-6 w-6 rounded-full flex items-center justify-center border-2 border-white dark:border-black shadow-md animate-in zoom-in duration-300">
                   {totalItems}
                 </span>
               )}

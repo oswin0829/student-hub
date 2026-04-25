@@ -65,12 +65,12 @@ export default function ProductCard({ product }: { product: Product }) {
   };
 
   return (
-    <div className="bg-white border border-gray-100 rounded-xl md:rounded-2xl overflow-hidden flex flex-col group h-full transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)]">
+    <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl md:rounded-2xl overflow-hidden flex flex-col group h-full transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] dark:hover:shadow-[0_20px_40px_-15px_rgba(255,255,255,0.02)]">
       
       {/* Image Area */}
       <Link 
         href={`/product/${product.id}`} 
-        className="relative w-full aspect-square bg-white flex items-center justify-center cursor-pointer overflow-hidden p-2 md:p-4"
+        className="relative w-full aspect-square bg-white dark:bg-gray-800 flex items-center justify-center cursor-pointer overflow-hidden p-2 md:p-4"
       >
         {product.image_url ? (
           <img 
@@ -84,19 +84,19 @@ export default function ProductCard({ product }: { product: Product }) {
              <span className="text-gray-400 font-medium italic text-[10px] uppercase tracking-widest">No Image</span>
           </div>
         )}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-slate-900/5 transition-colors duration-300" />
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-slate-900/5 dark:group-hover:bg-black/20 transition-colors duration-300" />
       </Link>
       
       <div className="p-3 md:p-5 flex flex-col flex-grow">
         
         {/* Category Badge */}
-        <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.25em] text-blue-600/80 mb-2">
+        <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.25em] text-gray-500 mb-2">
           {product.category || "General"}
         </p>
 
         {/* Title */}
         <Link href={`/product/${product.id}`}>
-          <h3 className="text-sm md:text-base font-semibold text-slate-800 mb-2 line-clamp-2 cursor-pointer group-hover:text-blue-600 transition-colors leading-snug tracking-tight">
+          <h3 className="text-sm md:text-base font-semibold text-black dark:text-white mb-2 line-clamp-2 cursor-pointer group-hover:text-gray-500 dark:group-hover:text-gray-300 transition-colors leading-snug tracking-tight">
             {product.name}
           </h3>
         </Link>
@@ -114,8 +114,8 @@ export default function ProductCard({ product }: { product: Product }) {
                 }}
                 className={`text-[9px] font-bold px-2 py-1 rounded-md border transition-all ${
                   selectedOption?.id === option.id
-                    ? "bg-blue-600 border-blue-600 text-white shadow-sm"
-                    : "bg-white border-gray-100 text-slate-500 hover:border-gray-200"
+                    ? "bg-black dark:bg-white border-black dark:border-white text-white dark:text-black shadow-sm"
+                    : "bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 text-slate-500 dark:text-slate-400 hover:border-gray-200 dark:hover:border-gray-600"
                 }`}
               >
                 {option.label}
@@ -131,22 +131,22 @@ export default function ProductCard({ product }: { product: Product }) {
               <span className="text-[10px] md:text-xs font-bold text-slate-400 font-mono">RM</span>
               
               {selectedOption ? (
-                 <span className="text-lg md:text-2xl font-black text-slate-900 tracking-tighter">
+                 <span className="text-lg md:text-2xl font-black text-slate-900 dark:text-white tracking-tighter">
                    {selectedOption.price.toFixed(2)}
                  </span>
               ) : isRange ? (
-                 <span className="text-sm md:text-lg font-black text-slate-900 tracking-tighter">
+                 <span className="text-sm md:text-lg font-black text-slate-900 dark:text-white tracking-tighter">
                    {minPrice.toFixed(2)} — {maxPrice.toFixed(2)}
                  </span>
               ) : (
-                 <span className="text-lg md:text-2xl font-black text-slate-900 tracking-tighter">
+                 <span className="text-lg md:text-2xl font-black text-slate-900 dark:text-white tracking-tighter">
                    {product.price.toFixed(2)}
                  </span>
               )}
             </div>
             
             {!selectedOption && isRange && (
-              <span className="text-[8px] uppercase font-bold text-blue-500/60 tracking-widest mt-0.5">
+              <span className="text-[8px] uppercase font-bold text-gray-400 tracking-widest mt-0.5">
                 Multiple Options Available
               </span>
             )}
@@ -155,7 +155,7 @@ export default function ProductCard({ product }: { product: Product }) {
           <button 
             type="button"
             onClick={handleAdd}
-            className="w-full bg-blue-600 text-white py-2.5 md:py-3 rounded-lg md:rounded-xl text-xs md:text-sm font-bold hover:bg-blue-700 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm"
+            className="w-full bg-black dark:bg-white text-white dark:text-black py-2.5 md:py-3 rounded-lg md:rounded-xl text-xs md:text-sm font-bold hover:bg-gray-800 dark:hover:bg-gray-200 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm"
           >
             <ShoppingCart size={16} strokeWidth={2.5} />
             <span className="xs:inline">Add to Cart</span>

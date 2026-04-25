@@ -11,6 +11,8 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   variable: '--font-plus-jakarta-sans',
 });
 
+import { ThemeProvider } from "@/components/ThemeProvider";
+
 export const metadata: Metadata = {
   title: "MegaHelper",
   description: "The ultimate hub for premium digital assets and automation tools.",
@@ -18,24 +20,26 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${plusJakartaSans.variable} scroll-smooth`}>
+    <html lang="en" className={`${plusJakartaSans.variable} scroll-smooth`} suppressHydrationWarning>
       <body className={`
         ${plusJakartaSans.className} 
         antialiased 
-        text-slate-900 
-        bg-white 
-        selection:bg-blue-100 selection:text-blue-900
+        text-black dark:text-white
+        bg-white dark:bg-black
+        selection:bg-slate-200 selection:text-black dark:selection:bg-slate-800 dark:selection:text-white
       `}>
-        <Toaster position="top-center" richColors /> 
-        
-        <Navbar />
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <Toaster position="top-center" richColors /> 
+          
+          <Navbar />
 
-        {/* 2. Added Social Bubbles here. They are fixed, so placement in the DOM doesn't matter much */}
-        <SocialBubbles /> 
-        
-        <div className="relative">
-          {children}
-        </div>
+          {/* 2. Added Social Bubbles here. They are fixed, so placement in the DOM doesn't matter much */}
+          <SocialBubbles /> 
+          
+          <div className="relative">
+            {children}
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );

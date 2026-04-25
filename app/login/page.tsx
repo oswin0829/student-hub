@@ -60,11 +60,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4 py-12">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-black px-4 py-12">
       <motion.div 
         layout 
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className="max-w-md w-full bg-white p-8 sm:p-10 rounded-[2rem] shadow-xl border border-gray-100 overflow-hidden"
+        className="max-w-md w-full bg-white dark:bg-gray-900 p-8 sm:p-10 rounded-[2rem] shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden"
       >
         
         {/* Logo & Branding */}
@@ -72,16 +72,16 @@ export default function LoginPage() {
           <div className="relative w-20 h-20 mb-4 transition-transform duration-500 hover:rotate-12">
             <Image src="/logo.png" alt="MegaHelper Logo" fill className="object-contain" priority />
           </div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tighter">MĒGA HELPER</h1>
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">MĒGA HELPER</h1>
         </div>
 
         {/* The Segmented Toggle */}
-        <div className="flex bg-slate-100 p-1.5 rounded-xl mb-8">
+        <div className="flex bg-slate-100 dark:bg-gray-800 p-1.5 rounded-xl mb-8">
           <button
             type="button"
             onClick={() => setAuthMode('sign_in')}
             className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-300 ${
-              authMode === 'sign_in' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-900'
+              authMode === 'sign_in' ? 'bg-white dark:bg-black text-black dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             Sign In
@@ -93,7 +93,7 @@ export default function LoginPage() {
               setConfirmPassword(''); 
             }}
             className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-300 ${
-              authMode === 'sign_up' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-900'
+              authMode === 'sign_up' ? 'bg-white dark:bg-black text-black dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             Create Account
@@ -103,24 +103,24 @@ export default function LoginPage() {
         {/* Manual Form Engine */}
         <form onSubmit={handleAuth} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
-            <label className="text-slate-600 font-bold text-xs uppercase tracking-wider">Email Address</label>
+            <label className="text-slate-600 dark:text-slate-300 font-bold text-xs uppercase tracking-wider">Email Address</label>
             <input 
               type="email" 
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full border border-gray-200 bg-gray-50 p-3 rounded-xl focus:outline-none focus:border-blue-600 focus:bg-white transition-colors"
+              className="w-full border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-black dark:text-white p-3 rounded-xl focus:outline-none focus:border-black dark:focus:border-gray-500 focus:bg-white dark:focus:bg-gray-900 transition-colors"
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-slate-600 font-bold text-xs uppercase tracking-wider">Password</label>
+            <label className="text-slate-600 dark:text-slate-300 font-bold text-xs uppercase tracking-wider">Password</label>
             <input 
               type="password" 
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-gray-200 bg-gray-50 p-3 rounded-xl focus:outline-none focus:border-blue-600 focus:bg-white transition-colors"
+              className="w-full border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-black dark:text-white p-3 rounded-xl focus:outline-none focus:border-black dark:focus:border-gray-500 focus:bg-white dark:focus:bg-gray-900 transition-colors"
             />
           </div>
 
@@ -133,7 +133,7 @@ export default function LoginPage() {
                 transition={{ duration: 0.2 }}
                 className="flex flex-col gap-1.5 overflow-hidden"
               >
-                <label className="text-slate-600 font-bold text-xs uppercase tracking-wider mt-1.5">
+                <label className="text-slate-600 dark:text-slate-300 font-bold text-xs uppercase tracking-wider mt-1.5">
                   Confirm Password
                 </label>
                 <input 
@@ -141,7 +141,7 @@ export default function LoginPage() {
                   required={authMode === 'sign_up'}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full border border-gray-200 bg-gray-50 p-3 rounded-xl focus:outline-none focus:border-blue-600 focus:bg-white transition-colors"
+                  className="w-full border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-black dark:text-white p-3 rounded-xl focus:outline-none focus:border-black dark:focus:border-gray-500 focus:bg-white dark:focus:bg-gray-900 transition-colors"
                 />
               </motion.div>
             )}
@@ -150,17 +150,17 @@ export default function LoginPage() {
           <button 
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl mt-4 hover:bg-blue-700 transition-all disabled:opacity-50 active:scale-95"
+            className="w-full bg-black dark:bg-white text-white dark:text-black font-bold py-3.5 rounded-xl mt-4 hover:bg-gray-800 dark:hover:bg-gray-200 transition-all disabled:opacity-50 active:scale-95"
           >
             {loading ? 'Processing...' : (authMode === 'sign_in' ? 'Log In' : 'Create Account')}
           </button>
         </form>
 
         {/* --- THE GUEST ESCAPE HATCH --- */}
-        <div className="mt-8 pt-6 border-t border-gray-100 flex justify-center">
+        <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex justify-center">
           <button 
             onClick={() => router.push('/checkout')}
-            className="text-sm font-bold text-slate-400 hover:text-slate-800 transition-colors"
+            className="text-sm font-bold text-slate-400 dark:text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-colors"
           >
             Continue as Guest
           </button>

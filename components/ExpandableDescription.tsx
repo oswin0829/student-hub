@@ -21,20 +21,20 @@ export default function ExpandableDescription({ text }: { text: string }) {
           wordBreak: 'break-word'
         }}
       >
-        <div className="text-gray-600 leading-relaxed text-[15px] font-medium pb-4">
+        <div className="text-gray-600 dark:text-gray-400 leading-relaxed text-[15px] font-medium pb-4">
           {text}
         </div>
 
         {/* Fades the text out when it's collapsed */}
         {!isExpanded && (
-          <div className="absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-white dark:from-black via-white/80 dark:via-black/80 to-transparent pointer-events-none" />
         )}
       </div>
       
       <button 
         type="button"
         onClick={() => setIsExpanded(!isExpanded)}
-        className="mt-2 w-fit text-blue-600 font-bold text-sm hover:text-blue-800 transition-colors flex items-center gap-1"
+        className="mt-2 w-fit text-black dark:text-white font-bold text-sm hover:text-gray-600 dark:hover:text-gray-300 transition-colors flex items-center gap-1"
       >
         {isExpanded ? "Show Less ▲" : "Read Full Details ▼"}
       </button>

@@ -38,11 +38,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [router]);
 
   if (!isAuthorized) {
-    return <div className="min-h-screen bg-slate-50 flex items-center justify-center font-bold text-slate-400">Verifying access...</div>;
+    return <div className="min-h-screen bg-slate-50 dark:bg-black flex items-center justify-center font-bold text-slate-400 dark:text-slate-500">Verifying access...</div>;
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-black">
       {children} 
     </div>
   );

@@ -50,12 +50,12 @@ export default function Storefront({ initialProducts }: { initialProducts: Produ
         
         {/* Search Bar */}
         <div className="relative w-full lg:max-w-xl group flex-shrink-0">
-          <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none transition-colors group-focus-within:text-blue-500">
+          <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none transition-colors group-focus-within:text-black dark:group-focus-within:text-white">
             <span className="text-gray-400 text-xl">🔍</span>
           </div>
           <input
             type="text"
-            className="block w-full pl-14 pr-6 py-4.5 border border-gray-100 rounded-2xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all shadow-sm hover:border-gray-200 text-slate-900"
+            className="block w-full pl-14 pr-6 py-4.5 border border-gray-100 dark:border-gray-800 rounded-2xl leading-5 bg-white dark:bg-gray-900 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800 focus:border-black dark:focus:border-gray-500 transition-all shadow-sm hover:border-gray-200 dark:hover:border-gray-700 text-black dark:text-white"
             placeholder="Search for digital tools..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -70,8 +70,8 @@ export default function Storefront({ initialProducts }: { initialProducts: Produ
               onClick={() => setSelectedCategory(category)}
               className={`px-7 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-300 flex-shrink-0 ${
                 selectedCategory === category
-                  ? "bg-blue-600 text-white shadow-[0_10px_25px_-5px_rgba(37,99,235,0.4)] scale-105"
-                  : "bg-white text-gray-500 border border-gray-100 hover:bg-gray-50 hover:border-gray-200 shadow-sm"
+                  ? "bg-black dark:bg-white text-white dark:text-black shadow-md scale-105"
+                  : "bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-200 dark:hover:border-gray-700 shadow-sm"
               }`}
             >
               {category}
@@ -112,18 +112,18 @@ export default function Storefront({ initialProducts }: { initialProducts: Produ
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full py-32 flex flex-col items-center justify-center bg-white rounded-[2rem] border border-gray-50 shadow-sm"
+              className="w-full py-32 flex flex-col items-center justify-center bg-white dark:bg-black rounded-[2rem] border border-gray-50 dark:border-gray-800 shadow-sm"
             >
-              <div className="bg-gray-50 p-8 rounded-full mb-6">
+              <div className="bg-gray-50 dark:bg-gray-900 p-8 rounded-full mb-6">
                 <span className="text-6xl">🏜️</span>
               </div>
-              <h3 className="text-2xl font-black text-gray-900 mb-2">No tools match your search</h3>
+              <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-2">No tools match your search</h3>
               <p className="text-gray-500 mb-8 text-center max-w-sm px-4 font-medium">
                 Try adjusting your filters or search for something else.
               </p>
               <button 
                 onClick={() => { setSearchQuery(""); setSelectedCategory("All"); }}
-                className="px-10 py-4 bg-gray-900 text-white rounded-2xl font-bold hover:bg-black hover:shadow-xl transition-all active:scale-95"
+                className="px-10 py-4 bg-gray-900 dark:bg-gray-100 text-white dark:text-black rounded-2xl font-bold hover:bg-black dark:hover:bg-white hover:shadow-xl transition-all active:scale-95"
               >
                 Clear all filters
               </button>

@@ -45,7 +45,7 @@ export default function AddToCartButton({ product }: { product: Product }) {
   return (
     <button 
       onClick={handleAddToCart}
-      className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition-all active:scale-95 shadow-lg shadow-blue-100 flex items-center justify-center gap-2"
+      className="w-full bg-black dark:bg-white text-white dark:text-black py-4 rounded-xl font-bold text-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-all active:scale-95 shadow-md flex items-center justify-center gap-2"
     >
       <ShoppingCart size={24} strokeWidth={2.5} />
       <span>Add to Cart</span>
