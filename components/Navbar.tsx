@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ShoppingCart, User, LogOut } from 'lucide-react'; 
+import { ShoppingCart, User, LogOut, Package } from 'lucide-react'; 
 import { useCartStore } from '@/store/cartStore';
 import { createBrowserClient } from '@supabase/ssr';
 import type { User as SupabaseUser } from '@supabase/supabase-js'; 
@@ -139,6 +139,17 @@ export default function Navbar() {
               >
                 <User size={22} strokeWidth={2.5} className="group-hover:translate-y-[-1px] transition-transform" />
                 <span className="hidden md:block">Login</span>
+              </Link>
+            )}
+
+            {/* Orders Icon (Logged In Only) */}
+            {user && (
+              <Link 
+                href="/orders" 
+                className="relative p-2 text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-all active:scale-90"
+                title="My Orders"
+              >
+                <Package size={26} strokeWidth={2.5} />
               </Link>
             )}
 

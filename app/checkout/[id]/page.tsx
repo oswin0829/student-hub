@@ -106,7 +106,7 @@ export default function ManualCheckoutPage() {
       const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
 
       // 2. Upload to Supabase Storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('receipts')
         .upload(fileName, compressedFile, {
           cacheControl: '3600',
@@ -182,13 +182,22 @@ export default function ManualCheckoutPage() {
           <p className="text-gray-500 dark:text-gray-400 mb-8 text-lg">
             Thank you for your purchase. We are verifying your DuitNow receipt. You will receive an email at <strong className="text-foreground">{email}</strong> once your order is fulfilled.
           </p>
-          <Link 
-            href="/"
-            className="inline-flex items-center gap-2 bg-primary hover:bg-primary-hover text-background px-8 py-4 rounded-xl font-bold transition-all"
-          >
-            <ArrowLeft size={20} />
-            Back to Store
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link 
+              href="/"
+              className="inline-flex items-center justify-center gap-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-foreground px-8 py-4 rounded-xl font-bold transition-all"
+            >
+              <ArrowLeft size={20} />
+              Back to Store
+            </Link>
+            <Link 
+              href="/orders"
+              className="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-background px-8 py-4 rounded-xl font-bold transition-all shadow-md"
+            >
+              <Package size={20} />
+              Track Your Order
+            </Link>
+          </div>
         </div>
       </main>
     );
