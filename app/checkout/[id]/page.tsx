@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
 import imageCompression from 'browser-image-compression';
-import { UploadCloud, CheckCircle2, AlertCircle, ShoppingBag, ArrowLeft } from 'lucide-react';
+import { UploadCloud, CheckCircle2, AlertCircle, ShoppingBag, ArrowLeft, Package } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import Image from 'next/image';
@@ -17,7 +17,7 @@ export default function ManualCheckoutPage() {
   const params = useParams();
   const id = params?.id as string;
 
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState<Product | null>(null);
   const [loadingProduct, setLoadingProduct] = useState(true);
   
   const [email, setEmail] = useState('');
@@ -41,7 +41,7 @@ export default function ManualCheckoutPage() {
           
         if (error) throw error;
         setProduct(data);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Error fetching product:", err);
         toast.error("Failed to load product details.");
       } finally {

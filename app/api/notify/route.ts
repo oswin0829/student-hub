@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     // Build the items list HTML
     let itemsHtml = '';
     if (isCart) {
-      itemsHtml = items.map((item: any) => `
+      itemsHtml = items.map((item: { name: string; quantity: number; price: number }) => `
         <li><strong>${item.name}</strong> x${item.quantity} - RM${item.price.toFixed(2)}</li>
       `).join('');
     } else {

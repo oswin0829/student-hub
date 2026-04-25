@@ -116,9 +116,10 @@ export default function OrdersPage() {
         );
 
         setOrders(groupedArray);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Full error object:", err);
-        const errorMessage = err?.message || err?.details || "Failed to fetch orders";
+        const errObj = err as { message?: string; details?: string };
+        const errorMessage = errObj.message || errObj.details || "Failed to fetch orders";
         toast.error(`Error: ${errorMessage}`);
       } finally {
         setLoading(false);

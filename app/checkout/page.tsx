@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'; 
 import { useCartStore } from '@/store/cartStore';
-import { Trash2, Plus, Minus, ShoppingBag, AlertCircle, CheckCircle2, UploadCloud, ArrowLeft } from 'lucide-react';
+import { Trash2, Plus, Minus, ShoppingBag, AlertCircle, CheckCircle2, UploadCloud, ArrowLeft, Package } from 'lucide-react';
 import Link from 'next/link';
 import { createBrowserClient } from '@supabase/ssr'; 
 import { motion, AnimatePresence } from 'framer-motion';
