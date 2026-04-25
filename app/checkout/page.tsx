@@ -95,7 +95,7 @@ export default function CheckoutPage() {
 
       // 4. Batch Insert into orders table
       const ordersToInsert = cart.map((item) => ({
-        product_id: parseInt(item.id || item.productId || "0"), // fallback for type safety based on store structure
+        product_id: item.id,
         amount: item.price * item.quantity,
         customer_email: userEmail,
         receipt_url: receiptUrl,
@@ -131,9 +131,10 @@ export default function CheckoutPage() {
       setIsSuccess(true);
       toast.success("Payment submitted successfully!", { id: "checkout" });
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Checkout error:", err);
-      toast.error(err.message || "An error occurred during checkout.", { id: "checkout" });
+      const errorMessage = err instanceof Error ? err.message : "An error occurred during checkout.";
+      toast.error(errorMessage, { id: "checkout" });
     } finally {
       setIsSubmitting(false);
     }

@@ -151,9 +151,10 @@ export default function ManualCheckoutPage() {
       setIsSuccess(true);
       toast.success("Payment submitted successfully!", { id: "checkout" });
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Checkout error:", err);
-      toast.error(err.message || "An error occurred during checkout.", { id: "checkout" });
+      const errorMessage = err instanceof Error ? err.message : "An error occurred during checkout.";
+      toast.error(errorMessage, { id: "checkout" });
     } finally {
       setIsSubmitting(false);
     }
