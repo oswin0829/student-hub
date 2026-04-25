@@ -55,17 +55,38 @@ export default function OrdersPage() {
       }
 
       try {
-        const { data, error } = await supabase
+        // 1. Fetch orders
+        const { data: ordersData, error: ordersError } = await supabase
           .from('orders')
-          .select('*, products(*)')
+          .select('*')
           .eq('customer_email', session.user.email)
           .order('created_at', { ascending: false });
 
-        if (error) throw error;
+        if (ordersError) throw ordersError;
 
-        // Group by transaction_id
-        const grouped = (data as OrderRow[]).reduce((acc: Record<string, GroupedOrder>, row) => {
-          // If a row somehow doesn't have a transaction_id (e.g. legacy data), use its ID as group
+        if (!ordersData || ordersData.length === 0) {
+          setOrders([]);
+          return;
+        }
+
+        // 2. Fetch products for these orders
+        const productIds = Array.from(new Set(ordersData.map(o => o.product_id)));
+        const { data: productsData, error: productsError } = await supabase
+          .from('products')
+          .select('*')
+          .in('id', productIds);
+
+        if (productsError) {
+           console.warn("Could not fetch product details:", productsError);
+        }
+
+        const productMap = (productsData || []).reduce((acc: Record<number, Product>, p) => {
+          acc[p.id] = p;
+          return acc;
+        }, {});
+
+        // 3. Group by transaction_id and attach product info
+        const grouped = (ordersData as OrderRow[]).reduce((acc: Record<string, GroupedOrder>, row) => {
           const txId = row.transaction_id || `legacy-${row.id}`;
           
           if (!acc[txId]) {
@@ -79,11 +100,17 @@ export default function OrdersPage() {
           }
           
           acc[txId].total_amount += Number(row.amount);
-          acc[txId].items.push(row);
+          
+          // Attach product info manually
+          const rowWithProduct = {
+            ...row,
+            products: productMap[row.product_id]
+          };
+          
+          acc[txId].items.push(rowWithProduct);
           return acc;
         }, {});
 
-        // Convert object to array and sort by created_at descending again just in case
         const groupedArray = Object.values(grouped).sort((a, b) => 
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );
