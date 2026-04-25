@@ -21,6 +21,7 @@ export default function ManualCheckoutPage() {
   const [loadingProduct, setLoadingProduct] = useState(true);
   
   const [email, setEmail] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   
@@ -52,6 +53,7 @@ export default function ManualCheckoutPage() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user?.email) {
         setEmail(session.user.email);
+        setIsLoggedIn(true);
       }
     });
 
@@ -273,6 +275,14 @@ export default function ManualCheckoutPage() {
                 <p className="text-[11px] font-medium text-gray-400 mt-2">
                   We will send your order details to this email after verification.
                 </p>
+                {!isLoggedIn && (
+                  <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">Save your orders and checkout faster.</span>
+                    <Link href={`/login?redirect=/checkout/${id}`} className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
+                      Log in or Sign up
+                    </Link>
+                  </div>
+                )}
               </div>
 
               <div>
@@ -280,55 +290,51 @@ export default function ManualCheckoutPage() {
                   Upload Receipt Image
                 </label>
                 
-                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-700 border-dashed rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                  <div className="space-y-2 text-center w-full">
-                    {previewUrl ? (
-                      <div className="flex flex-col items-center">
-                        <div className="relative w-full max-w-[200px] h-40 mb-4 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-                          <Image src={previewUrl} alt="Receipt preview" fill className="object-cover" />
-                        </div>
-                        <button 
-                          type="button" 
-                          onClick={() => { setReceiptFile(null); setPreviewUrl(null); }}
-                          className="text-xs font-bold text-red-500 hover:text-red-600 bg-red-50 dark:bg-red-900/20 px-3 py-1.5 rounded-lg transition-colors"
-                        >
-                          Remove Image
-                        </button>
+                <div className="mt-1">
+                  {previewUrl ? (
+                    <div className="flex flex-col items-center p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl">
+                      <div className="relative w-full max-w-[200px] h-40 mb-4 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                        <Image src={previewUrl} alt="Receipt preview" fill className="object-cover" />
                       </div>
-                    ) : (
-                      <>
-                        <UploadCloud className="mx-auto h-12 w-12 text-gray-400" />
-                        <div className="flex text-sm text-gray-600 dark:text-gray-400 justify-center">
-                          <label
-                            htmlFor="file-upload"
-                            className="relative cursor-pointer bg-background rounded-md font-medium text-primary hover:text-primary-hover focus-within:outline-none"
-                          >
-                            <span>Upload a file</span>
-                            <input id="file-upload" name="file-upload" type="file" className="sr-only" accept="image/*" onChange={handleFileChange} />
-                          </label>
-                          <p className="pl-1">or drag and drop</p>
-                        </div>
-                        <p className="text-xs text-gray-500 dark:text-gray-500">
-                          PNG, JPG, GIF up to 10MB
-                        </p>
-                      </>
-                    )}
-                  </div>
+                      <button 
+                        type="button" 
+                        onClick={() => { setReceiptFile(null); setPreviewUrl(null); }}
+                        className="text-xs font-bold text-red-500 hover:text-red-600 bg-red-50 dark:bg-red-900/20 px-4 py-2 rounded-lg transition-colors"
+                      >
+                        Remove Image
+                      </button>
+                    </div>
+                  ) : (
+                    <label
+                      htmlFor="file-upload"
+                      className="flex flex-col items-center justify-center px-6 pt-8 pb-8 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/80 hover:border-gray-400 dark:hover:border-gray-500 transition-all cursor-pointer group"
+                    >
+                      <UploadCloud className="h-14 w-14 text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300 mb-4 transition-colors" />
+                      <span className="bg-white dark:bg-gray-800 text-black dark:text-white px-6 py-2.5 rounded-xl font-bold border border-gray-200 dark:border-gray-600 shadow-sm mb-3 group-hover:shadow transition-all">
+                        Click to Upload Receipt
+                      </span>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">or drag and drop your file here</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 font-medium">
+                        Supports PNG, JPG, JPEG (Max 10MB)
+                      </p>
+                      <input id="file-upload" name="file-upload" type="file" className="sr-only" accept="image/*" onChange={handleFileChange} />
+                    </label>
+                  )}
                 </div>
               </div>
 
               <button 
                 type="submit"
                 disabled={isSubmitting || !product}
-                className="w-full bg-primary text-background py-4 rounded-xl font-bold text-lg hover:bg-primary-hover transition-all active:scale-[0.98] shadow-md disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full bg-black dark:bg-white text-white dark:text-black py-4 rounded-xl font-bold text-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-all active:scale-[0.98] shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 border border-transparent dark:border-gray-200"
               >
                 {isSubmitting ? (
                   <>
-                    <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-background" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Uploading...
+                    Verifying Payment...
                   </>
                 ) : (
                   `Submit Payment of RM${product?.price?.toFixed(2) || '0.00'}`

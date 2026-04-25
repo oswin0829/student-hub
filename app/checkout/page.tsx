@@ -18,6 +18,7 @@ export default function CheckoutPage() {
   const { cart, cartTotal, removeFromCart, clearCart, updateQuantity } = useCartStore();
   
   const [userEmail, setUserEmail] = useState<string>('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isConfirmingClear, setIsConfirmingClear] = useState(false);
   
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
@@ -29,6 +30,7 @@ export default function CheckoutPage() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user?.email) {
         setUserEmail(session.user.email);
+        setIsLoggedIn(true);
       }
     });
   }, []);
@@ -375,6 +377,14 @@ export default function CheckoutPage() {
                   <p className="text-[11px] font-medium text-gray-400 mt-2">
                     We will send your order details to this email after verification.
                   </p>
+                  {!isLoggedIn && (
+                    <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">Save your orders and checkout faster.</span>
+                      <Link href="/login?redirect=/checkout" className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
+                        Log in or Sign up
+                      </Link>
+                    </div>
+                  )}
                 </div>
 
                 <div>
