@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-// Initialize Resend with the API key from environment variables
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(request: Request) {
   try {
+    // Initialize Resend inside the request handler so it doesn't fail Vercel static build if env var is missing
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    
     const body = await request.json();
     
     // Support both single-item checkout and cart checkout formats
