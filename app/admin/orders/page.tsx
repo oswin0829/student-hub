@@ -132,13 +132,23 @@ export default function AdminOrdersPage() {
   const updateStatus = async (txId: string, newStatus: string) => {
     setUpdating(txId);
     try {
-      const { error } = await supabase
-        .from('orders')
-        .update({ status: newStatus })
-        .eq('transaction_id', txId);
+      // Get the current user's session token to authenticate the API call
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
 
-      if (error) throw error;
+      const res = await fetch('/api/admin/update-order-status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ transaction_id: txId, status: newStatus }),
+      });
 
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? 'Update failed');
+
+      // Optimistically update local state
       setOrders(prev =>
         prev.map(o =>
           o.transaction_id === txId
