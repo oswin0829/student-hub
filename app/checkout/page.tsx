@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'; 
 import { useCartStore } from '@/store/cartStore';
-import { Trash2, Plus, Minus, ShoppingBag, AlertCircle, CheckCircle2, UploadCloud, ArrowLeft, Package } from 'lucide-react';
+import { Trash2, Plus, Minus, ShoppingBag, AlertCircle, CheckCircle2, UploadCloud, ArrowLeft, Package, X, Expand } from 'lucide-react';
 import Link from 'next/link';
 import { createBrowserClient } from '@supabase/ssr'; 
 import { motion, AnimatePresence } from 'framer-motion';
@@ -25,6 +25,7 @@ export default function CheckoutPage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [qrExpanded, setQrExpanded] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -341,9 +342,15 @@ export default function CheckoutPage() {
             {/* DuitNow Instructions */}
             <div className="bg-card rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 md:p-8 flex flex-col items-center text-center">
               <h2 className="text-lg font-bold mb-2">Pay via DuitNow</h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Scan the QR code below using your banking app or e-wallet.</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Scan the QR code below using your banking app or e-wallet.</p>
               
-              <div className="bg-white p-4 rounded-xl border-4 border-gray-100 shadow-md mb-6 w-64 h-64 relative">
+              {/* Expandable QR code */}
+              <button
+                type="button"
+                onClick={() => setQrExpanded(true)}
+                className="group relative bg-white p-4 rounded-xl border-4 border-gray-100 shadow-md mb-3 w-64 h-64 hover:border-blue-300 hover:shadow-lg transition-all cursor-zoom-in"
+                title="Tap to enlarge"
+              >
                 <Image 
                   src="/duitnow-qr.jpeg" 
                   alt="DuitNow QR Code" 
@@ -351,7 +358,14 @@ export default function CheckoutPage() {
                   className="object-contain p-2"
                   priority
                 />
-              </div>
+                {/* Expand hint overlay */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 rounded-lg flex items-center justify-center transition-all">
+                  <div className="opacity-0 group-hover:opacity-100 bg-white/90 rounded-full p-2 shadow-md transition-all">
+                    <Expand size={20} className="text-gray-700" />
+                  </div>
+                </div>
+              </button>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mb-5">Tap to enlarge QR code</p>
 
               <div className="flex items-start gap-3 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl text-left w-full">
                 <AlertCircle size={18} className="flex-shrink-0 mt-0.5 text-blue-500" />
@@ -360,6 +374,50 @@ export default function CheckoutPage() {
                 </p>
               </div>
             </div>
+
+            {/* QR Expanded Modal */}
+            <AnimatePresence>
+              {qrExpanded && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+                  onClick={() => setQrExpanded(false)}
+                >
+                  <motion.div
+                    initial={{ scale: 0.85, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.85, opacity: 0 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="relative bg-white rounded-2xl p-6 shadow-2xl max-w-sm w-full flex flex-col items-center"
+                  >
+                    <button
+                      onClick={() => setQrExpanded(false)}
+                      className="absolute top-3 right-3 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors"
+                    >
+                      <X size={18} />
+                    </button>
+                    <h3 className="font-bold text-gray-800 mb-1">DuitNow QR Code</h3>
+                    <p className="text-xs text-gray-400 mb-4">Scan with your banking app or e-wallet</p>
+                    <div className="relative w-72 h-72">
+                      <Image
+                        src="/duitnow-qr.jpeg"
+                        alt="DuitNow QR Code (enlarged)"
+                        fill
+                        className="object-contain"
+                        priority
+                      />
+                    </div>
+                    <p className="text-sm font-bold text-gray-600 mt-4">
+                      Transfer: <span className="text-black">RM{cartTotal().toFixed(2)}</span>
+                    </p>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* RIGHT SIDE: Payment Form */}
