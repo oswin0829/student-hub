@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createBrowserClient } from '@supabase/ssr';
 import { motion } from 'framer-motion';
-import { Plus, Edit3, Package } from 'lucide-react';
+import { Plus, Edit3, Package, ClipboardList } from 'lucide-react';
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -46,13 +46,22 @@ export default function AdminDashboard() {
           <p className="text-slate-500 dark:text-slate-400 mt-1">Manage your digital assets.</p>
         </div>
         
-        <Link 
-          href="/admin/add-product"
-          className="bg-black dark:bg-white text-white dark:text-black font-bold px-6 py-3 rounded-2xl hover:bg-gray-800 dark:hover:bg-gray-200 transition-all flex items-center gap-2 shadow-md active:scale-95"
-        >
-          <Plus size={20} strokeWidth={3} /> 
-          <span>Add Product</span>
-        </Link>
+        <div className="flex gap-3 flex-wrap">
+          <Link 
+            href="/admin/add-product"
+            className="bg-black dark:bg-white text-white dark:text-black font-bold px-6 py-3 rounded-2xl hover:bg-gray-800 dark:hover:bg-gray-200 transition-all flex items-center gap-2 shadow-md active:scale-95"
+          >
+            <Plus size={20} strokeWidth={3} /> 
+            <span>Add Product</span>
+          </Link>
+          <Link 
+            href="/admin/orders"
+            className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold px-6 py-3 rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all flex items-center gap-2 shadow-sm active:scale-95"
+          >
+            <ClipboardList size={20} />
+            <span>View Orders</span>
+          </Link>
+        </div>
       </div>
 
       <div className="bg-white dark:bg-gray-900 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden p-2">
