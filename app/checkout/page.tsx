@@ -36,11 +36,20 @@ export default function CheckoutPage() {
     });
   }, []);
 
+  const ALLOWED_EXTS = ['jpg', 'jpeg', 'png'];
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (!file.type.startsWith('image/')) {
-        toast.error("Please upload an image file.");
+      const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+      if (!ALLOWED_EXTS.includes(ext)) {
+        toast.error("Only JPG and PNG files are accepted.");
+        e.target.value = '';
+        return;
+      }
+      if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
+        toast.error("Invalid file type. Please upload a JPG or PNG.");
+        e.target.value = '';
         return;
       }
       setReceiptFile(file);
@@ -91,6 +100,8 @@ export default function CheckoutPage() {
 
       if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`);
 
+      // Store only the file name — the server will generate a signed URL
+      const receiptFileName = fileName;
       const receiptUrl = `${supabaseUrl}/storage/v1/object/public/receipts/${fileName}`;
 
       // 3. Generate a shared transaction ID
@@ -113,7 +124,7 @@ export default function CheckoutPage() {
 
       if (orderError) throw new Error(`Order creation failed: ${orderError.message}`);
 
-      // 5. Notify via Resend API
+      // 5. Notify via Resend API (server generates a signed URL for the receipt)
       const notifyRes = await fetch('/api/notify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -122,7 +133,8 @@ export default function CheckoutPage() {
           items: cart.map(i => ({ name: i.name, quantity: i.quantity, price: i.price * i.quantity })),
           totalPrice: cartTotal(),
           customerEmail: userEmail,
-          receiptUrl: receiptUrl
+          receiptUrl,
+          receiptFileName, // used by server to generate a 1-hour signed URL
         })
       });
 
