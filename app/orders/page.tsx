@@ -263,20 +263,7 @@ export default function OrdersPage() {
                     </div>
                   ))}
                 </div>
-                
-                {/* View Receipt Link (Optional extra detail) */}
-                {order.items[0]?.receipt_url && (
-                  <div className="bg-gray-50/50 dark:bg-gray-900/30 px-5 py-3 border-t border-gray-100 dark:border-gray-800 flex justify-end">
-                    <a 
-                      href={order.items[0].receipt_url} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
-                    >
-                      View Uploaded Receipt <ChevronRight size={14} />
-                    </a>
-                  </div>
-                )}
+
                 
               </div>
             ))}

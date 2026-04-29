@@ -2,13 +2,12 @@
 
 import { useState, useEffect } from 'react'; 
 import { useCartStore } from '@/store/cartStore';
-import { Trash2, Plus, Minus, ShoppingBag, AlertCircle, CheckCircle2, UploadCloud, ArrowLeft, Package, X, Expand } from 'lucide-react';
+import { createPayment } from '@/app/actions/checkout';
+import { Trash2, Plus, Minus, ShoppingBag, AlertCircle, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import { createBrowserClient } from '@supabase/ssr'; 
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
-import Image from 'next/image';
-import imageCompression from 'browser-image-compression';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
@@ -17,15 +16,10 @@ const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);
 export default function CheckoutPage() {
   const { cart, cartTotal, removeFromCart, clearCart, updateQuantity } = useCartStore();
   
+  const [userName, setUserName] = useState<string>('');
   const [userEmail, setUserEmail] = useState<string>('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isConfirmingClear, setIsConfirmingClear] = useState(false);
-  
-  const [receiptFile, setReceiptFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [qrExpanded, setQrExpanded] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -35,155 +29,6 @@ export default function CheckoutPage() {
       }
     });
   }, []);
-
-  const ALLOWED_EXTS = ['jpg', 'jpeg', 'png'];
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
-      if (!ALLOWED_EXTS.includes(ext)) {
-        toast.error("Only JPG and PNG files are accepted.");
-        e.target.value = '';
-        return;
-      }
-      if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
-        toast.error("Invalid file type. Please upload a JPG or PNG.");
-        e.target.value = '';
-        return;
-      }
-      setReceiptFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!userEmail) {
-      toast.error("Please provide an email address.");
-      return;
-    }
-    
-    if (!receiptFile) {
-      toast.error("Please upload your DuitNow receipt.");
-      return;
-    }
-    
-    if (cart.length === 0) {
-      toast.error("Your cart is empty.");
-      return;
-    }
-
-    setIsSubmitting(true);
-    toast.loading("Processing your payment...", { id: "checkout" });
-
-    try {
-      // 1. Compress Image
-      const options = {
-        maxSizeMB: 0.5,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true
-      };
-      
-      const compressedFile = await imageCompression(receiptFile, options);
-      const fileExt = receiptFile.name.split('.').pop();
-      const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
-
-      // 2. Upload to Supabase Storage
-      const { error: uploadError } = await supabase.storage
-        .from('receipts')
-        .upload(fileName, compressedFile, {
-          cacheControl: '3600',
-          upsert: false
-        });
-
-      if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`);
-
-      // Store only the file name — the server will generate a signed URL
-      const receiptFileName = fileName;
-      const receiptUrl = `${supabaseUrl}/storage/v1/object/public/receipts/${fileName}`;
-
-      // 3. Generate a shared transaction ID
-      const transactionId = crypto.randomUUID();
-
-      // 4. Batch Insert into orders table
-      const ordersToInsert = cart.map((item) => ({
-        product_id: item.id,
-        amount: item.price * item.quantity,
-        customer_email: userEmail,
-        receipt_url: receiptUrl,
-        status: 'pending',
-        transaction_id: transactionId
-      }));
-
-      const { error: orderError } = await supabase
-        .from('orders')
-        .insert(ordersToInsert)
-        .select();
-
-      if (orderError) throw new Error(`Order creation failed: ${orderError.message}`);
-
-      // 5. Notify via Resend API (server generates a signed URL for the receipt)
-      const notifyRes = await fetch('/api/notify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          transactionId,
-          items: cart.map(i => ({ name: i.name, quantity: i.quantity, price: i.price * i.quantity })),
-          totalPrice: cartTotal(),
-          customerEmail: userEmail,
-          receiptUrl,
-          receiptFileName, // used by server to generate a 1-hour signed URL
-        })
-      });
-
-      if (!notifyRes.ok) {
-        console.warn("Notification failed, but orders were saved.");
-      }
-
-      clearCart();
-      setIsSuccess(true);
-      toast.success("Payment submitted successfully!", { id: "checkout" });
-
-    } catch (err: unknown) {
-      console.error("Checkout error:", err);
-      const errorMessage = err instanceof Error ? err.message : "An error occurred during checkout.";
-      toast.error(errorMessage, { id: "checkout" });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  if (isSuccess) {
-    return (
-      <main className="min-h-screen bg-background text-foreground py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
-        <div className="max-w-xl mx-auto text-center bg-card rounded-3xl p-10 border border-gray-200 dark:border-gray-800 shadow-lg">
-          <CheckCircle2 size={80} className="text-green-500 mx-auto mb-6" />
-          <h1 className="text-3xl font-black mb-4">Payment Received!</h1>
-          <p className="text-gray-500 dark:text-gray-400 mb-8 text-lg">
-            Thank you for your purchase. We are verifying your DuitNow receipt. You will receive an email at <strong className="text-foreground">{userEmail}</strong> once your order is fulfilled.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
-              href="/"
-              className="inline-flex items-center justify-center gap-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-foreground px-8 py-4 rounded-xl font-bold transition-all"
-            >
-              <ArrowLeft size={20} />
-              Back to Store
-            </Link>
-            <Link 
-              href="/orders"
-              className="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-background px-8 py-4 rounded-xl font-bold transition-all shadow-md"
-            >
-              <Package size={20} />
-              Track Your Order
-            </Link>
-          </div>
-        </div>
-      </main>
-    );
-  }
 
   if (cart.length === 0) {
     return (
@@ -350,86 +195,6 @@ export default function CheckoutPage() {
                 </div>
               </div>
             </div>
-            
-            {/* DuitNow Instructions */}
-            <div className="bg-card rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 md:p-8 flex flex-col items-center text-center">
-              <h2 className="text-lg font-bold mb-2">Pay via DuitNow</h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Scan the QR code below using your banking app or e-wallet.</p>
-              
-              {/* Expandable QR code */}
-              <button
-                type="button"
-                onClick={() => setQrExpanded(true)}
-                className="group relative bg-white p-4 rounded-xl border-4 border-gray-100 shadow-md mb-3 w-64 h-64 hover:border-blue-300 hover:shadow-lg transition-all cursor-zoom-in"
-                title="Tap to enlarge"
-              >
-                <Image 
-                  src="/duitnow-qr.jpeg" 
-                  alt="DuitNow QR Code" 
-                  fill
-                  className="object-contain p-2"
-                  priority
-                />
-                {/* Expand hint overlay */}
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 rounded-lg flex items-center justify-center transition-all">
-                  <div className="opacity-0 group-hover:opacity-100 bg-white/90 rounded-full p-2 shadow-md transition-all">
-                    <Expand size={20} className="text-gray-700" />
-                  </div>
-                </div>
-              </button>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mb-5">Tap to enlarge QR code</p>
-
-              <div className="flex items-start gap-3 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl text-left w-full">
-                <AlertCircle size={18} className="flex-shrink-0 mt-0.5 text-blue-500" />
-                <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300">
-                  Please ensure you transfer the exact amount of <strong className="text-foreground">RM{cartTotal().toFixed(2)}</strong>. Save a screenshot of the successful transaction to upload.
-                </p>
-              </div>
-            </div>
-
-            {/* QR Expanded Modal */}
-            <AnimatePresence>
-              {qrExpanded && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
-                  onClick={() => setQrExpanded(false)}
-                >
-                  <motion.div
-                    initial={{ scale: 0.85, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.85, opacity: 0 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                    onClick={(e) => e.stopPropagation()}
-                    className="relative bg-white rounded-2xl p-6 shadow-2xl max-w-sm w-full flex flex-col items-center"
-                  >
-                    <button
-                      onClick={() => setQrExpanded(false)}
-                      className="absolute top-3 right-3 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors"
-                    >
-                      <X size={18} />
-                    </button>
-                    <h3 className="font-bold text-gray-800 mb-1">DuitNow QR Code</h3>
-                    <p className="text-xs text-gray-400 mb-4">Scan with your banking app or e-wallet</p>
-                    <div className="relative w-72 h-72">
-                      <Image
-                        src="/duitnow-qr.jpeg"
-                        alt="DuitNow QR Code (enlarged)"
-                        fill
-                        className="object-contain"
-                        priority
-                      />
-                    </div>
-                    <p className="text-sm font-bold text-gray-600 mt-4">
-                      Transfer: <span className="text-black">RM{cartTotal().toFixed(2)}</span>
-                    </p>
-                  </motion.div>
-                </motion.div>
-              )}
-            </AnimatePresence>
           </div>
 
           {/* RIGHT SIDE: Payment Form */}
@@ -437,7 +202,25 @@ export default function CheckoutPage() {
             <div className="bg-card rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 md:p-8 sticky top-6">
               <h2 className="text-xl font-bold mb-6">Payment Verification</h2>
               
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form action={createPayment} className="space-y-6">
+                <input type="hidden" name="amount" value={cartTotal()} />
+                <input type="hidden" name="cartData" value={JSON.stringify(cart)} />
+                
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">
+                    Customer Name
+                  </label>
+                  <input 
+                    type="text" 
+                    name="name" 
+                    required
+                    value={userName}
+                    onChange={(e) => setUserName(e.target.value)}
+                    placeholder="John Doe"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground outline-none transition-all shadow-sm mb-4"
+                  />
+                </div>
+                
                 <div>
                   <div className="flex items-end justify-between mb-2">
                     <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
@@ -445,81 +228,64 @@ export default function CheckoutPage() {
                     </label>
                   </div>
                   
-                  <input 
-                    type="email" 
-                    required
-                    value={userEmail}
-                    onChange={(e) => setUserEmail(e.target.value)}
-                    placeholder="you@example.com"
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground outline-none transition-all shadow-sm"
-                  />
-                  <p className="text-[11px] font-medium text-gray-400 mt-2">
-                    We will send your order details to this email after verification.
-                  </p>
-                  {!isLoggedIn && (
-                    <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                      <span className="text-xs text-gray-500 dark:text-gray-400">Save your orders and checkout faster.</span>
-                      <Link href="/login?redirect=/checkout" className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
-                        Log in or Sign up
+                  {!userEmail && (
+                    <div className="flex items-end justify-between mb-2">
+                      <Link 
+                        href="/login?redirect=/checkout" 
+                        className="text-[11px] font-black text-foreground hover:opacity-70 transition-colors"
+                      >
+                        Sign In / Create Account
                       </Link>
+                    </div>
+                  )}
+                  
+                  {isLoggedIn && userEmail ? (
+                    <div className="bg-card border border-gray-200 dark:border-gray-800 rounded-xl p-4 flex items-center justify-between shadow-sm">
+                      <div className="flex flex-col">
+                        <span className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-0.5">
+                          Digital Delivery To
+                        </span>
+                        <span className="text-base font-bold text-foreground">
+                          {userEmail}
+                        </span>
+                      </div>
+                      <div className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-[10px] font-black px-2 py-1 rounded-full flex items-center gap-1">
+                        <CheckCircle2 size={12} strokeWidth={3} />
+                        VERIFIED
+                      </div>
+                      <input type="hidden" name="email" value={userEmail} />
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <input 
+                        type="email" 
+                        name="email" 
+                        required
+                        value={userEmail}
+                        onChange={(e) => setUserEmail(e.target.value)}
+                        placeholder="you@example.com"
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground outline-none transition-all shadow-sm"
+                      />
+                      <p className="text-[10px] font-medium text-gray-400 mt-2">
+                        Checking out as a guest. We recommend creating an account to save your tools permanently.
+                      </p>
                     </div>
                   )}
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">
-                    Upload Receipt Image
-                  </label>
-                  
-                  <div className="mt-1">
-                    {previewUrl ? (
-                      <div className="flex flex-col items-center p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl">
-                        <div className="relative w-full max-w-[200px] h-40 mb-4 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-                          <Image src={previewUrl} alt="Receipt preview" fill className="object-cover" />
-                        </div>
-                        <button 
-                          type="button" 
-                          onClick={() => { setReceiptFile(null); setPreviewUrl(null); }}
-                          className="text-xs font-bold text-red-500 hover:text-red-600 bg-red-50 dark:bg-red-900/20 px-4 py-2 rounded-lg transition-colors"
-                        >
-                          Remove Image
-                        </button>
-                      </div>
-                    ) : (
-                      <label
-                        htmlFor="file-upload"
-                        className="flex flex-col items-center justify-center px-6 pt-8 pb-8 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/80 hover:border-gray-400 dark:hover:border-gray-500 transition-all cursor-pointer group"
-                      >
-                        <UploadCloud className="h-14 w-14 text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300 mb-4 transition-colors" />
-                        <span className="bg-white dark:bg-gray-800 text-black dark:text-white px-6 py-2.5 rounded-xl font-bold border border-gray-200 dark:border-gray-600 shadow-sm mb-3 group-hover:shadow transition-all">
-                          Click to Upload Receipt
-                        </span>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">or drag and drop your file here</p>
-                        <p className="text-xs text-gray-400 dark:text-gray-500 font-medium">
-                          Supports PNG, JPG, JPEG (Max 10MB)
-                        </p>
-                        <input id="file-upload" name="file-upload" type="file" className="sr-only" accept="image/*" onChange={handleFileChange} />
-                      </label>
-                    )}
-                  </div>
+                <div className="flex items-start gap-3 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 p-4 rounded-xl mt-4">
+                  <AlertCircle size={18} className="text-foreground flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                    Secure checkout via Billplz. Your digital product will be sent instantly to the email provided above after successful payment.
+                  </p>
                 </div>
 
                 <button 
                   type="submit"
-                  disabled={isSubmitting || cart.length === 0}
-                  className="w-full bg-black dark:bg-white text-white dark:text-black py-4 rounded-xl font-bold text-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-all active:scale-[0.98] shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 border border-transparent dark:border-gray-200"
+                  disabled={cart.length === 0}
+                  className="w-full bg-black dark:bg-white text-white dark:text-black py-4 rounded-xl font-bold text-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-all active:scale-[0.98] shadow-lg disabled:opacity-50 disabled:cursor-not-allowed mt-4"
                 >
-                  {isSubmitting ? (
-                    <>
-                      <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Verifying Payment...
-                    </>
-                  ) : (
-                    `Submit Payment of RM${cartTotal().toFixed(2)}`
-                  )}
+                  Pay RM{cartTotal().toFixed(2)}
                 </button>
               </form>
             </div>
