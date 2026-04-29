@@ -37,20 +37,20 @@
 
 @layer base {
   :root {
-    /* Light Mode */
-    --background: #ffffff;
-    --foreground: #000000;
-    --primary: #000000;    /* black */
-    --primary-hover: #333333;
-    --card: #fafafa;
+    /* Light Mode - Sleek Slate aesthetic to completely eliminate bright white glare */
+    --background: #e2e8f0;
+    --foreground: #0f172a;
+    --primary: #5a51e6;
+    --primary-hover: #4338ca;
+    --card: #ffffff;
   }
 
   [data-theme='dark'] {
     /* Dark Mode */
-    --background: #000000;
+    --background: #09090b;
     --foreground: #ffffff;
-    --primary: #ffffff;    /* white */
-    --primary-hover: #e5e5e5;
-    --card: #111111;
+    --primary: #6366f1;
+    --primary-hover: #818cf8;
+    --card: #141417;
   }
 }

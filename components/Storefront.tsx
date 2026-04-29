@@ -55,7 +55,7 @@ export default function Storefront({ initialProducts }: { initialProducts: Produ
           </div>
           <input
             type="text"
-            className="block w-full pl-14 pr-6 py-4.5 border border-gray-100 dark:border-gray-800 rounded-2xl leading-5 bg-white dark:bg-gray-900 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-200/50 dark:focus:ring-gray-800 focus:border-black dark:focus:border-gray-500 transition-all shadow-sm hover:border-gray-200 dark:hover:border-gray-700 text-black dark:text-white"
+            className="block w-full pl-14 pr-6 py-4.5 border border-black/5 dark:border-white/10 rounded-2xl leading-5 bg-white/50 dark:bg-black/50 backdrop-blur-md placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-black/5 dark:focus:ring-white/5 focus:border-black/20 dark:focus:border-white/20 transition-all shadow-inner hover:border-black/10 dark:hover:border-white/20 text-black dark:text-white"
             placeholder="Search for digital tools..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -70,8 +70,8 @@ export default function Storefront({ initialProducts }: { initialProducts: Produ
               onClick={() => setSelectedCategory(category)}
               className={`px-7 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-300 flex-shrink-0 ${
                 selectedCategory === category
-                  ? "bg-black dark:bg-white text-white dark:text-black shadow-md scale-105"
-                  : "bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-200 dark:hover:border-gray-700 shadow-sm"
+                  ? "bg-black dark:bg-white text-white dark:text-black shadow-lg scale-105"
+                  : "bg-white/50 dark:bg-black/50 backdrop-blur-md text-slate-500 dark:text-slate-400 border border-black/5 dark:border-white/10 hover:border-black/10 dark:hover:border-white/20 hover:shadow-sm"
               }`}
             >
               {category}

@@ -18,7 +18,7 @@ interface Product {
   price: number; 
   category: string;
   image_url?: string;
-  description?: string; // Add this line!
+  description?: string;
   options?: ProductOption[];
 }
 
@@ -65,57 +65,65 @@ export default function ProductCard({ product }: { product: Product }) {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl md:rounded-2xl overflow-hidden flex flex-col group h-full transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] dark:hover:shadow-[0_20px_40px_-15px_rgba(255,255,255,0.02)]">
+    <div className="bg-white dark:bg-[#111113]/80 border border-black/5 dark:border-white/10 rounded-[2rem] shadow-sm hover:shadow-premium dark:shadow-premium-dark overflow-hidden flex flex-col group h-full transition-all duration-500 hover:-translate-y-2 hover:border-black/10 dark:hover:border-white/20">
       
       {/* Image Area */}
       <Link 
         href={`/product/${product.id}`} 
-        className="relative w-full aspect-square bg-white dark:bg-gray-800 flex items-center justify-center cursor-pointer overflow-hidden p-2 md:p-4"
+        className="relative w-full aspect-[4/3] bg-slate-50 dark:bg-white/[0.02] flex items-center justify-center cursor-pointer overflow-hidden p-8"
       >
         {product.image_url ? (
           <img 
             src={product.image_url} 
             alt={product.name}
-            className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-700 ease-out"
+            className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-700 ease-out drop-shadow-xl"
           />
         ) : (
-          <div className="flex flex-col items-center gap-1">
-             <span className="text-xl md:text-3xl opacity-20">📦</span>
-             <span className="text-gray-400 font-medium italic text-[10px] uppercase tracking-widest">No Image</span>
+          <div className="flex flex-col items-center gap-2">
+             <span className="text-3xl md:text-5xl opacity-20 drop-shadow-md">📦</span>
+             <span className="text-slate-400 font-bold text-[10px] uppercase tracking-[0.2em]">No Image</span>
           </div>
         )}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-slate-900/5 dark:group-hover:bg-black/20 transition-colors duration-300" />
+        {/* Shine Effect */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
       </Link>
       
-      <div className="p-3 md:p-5 flex flex-col flex-grow">
+      <div className="p-5 md:p-6 flex flex-col flex-grow relative">
         
         {/* Category Badge */}
-        <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.25em] text-gray-500 mb-2">
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary dark:text-primary mb-3">
           {product.category || "General"}
         </p>
 
         {/* Title */}
         <Link href={`/product/${product.id}`}>
-          <h3 className="text-sm md:text-base font-semibold text-black dark:text-white mb-2 line-clamp-2 cursor-pointer group-hover:text-gray-500 dark:group-hover:text-gray-300 transition-colors leading-snug tracking-tight">
+          <h3 className="font-outfit text-xl font-black text-foreground mb-2 line-clamp-2 cursor-pointer group-hover:text-primary transition-colors leading-tight tracking-tight">
             {product.name}
           </h3>
         </Link>
+        
+        {/* Description Snippet (if available) */}
+        {product.description && (
+          <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mb-4 leading-relaxed">
+            {product.description}
+          </p>
+        )}
 
-        {/* Variant Selection Pills - FIXED: Unique Keys */}
+        {/* Variant Selection Pills */}
         {product.options && product.options.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-4 mt-1">
+          <div className="flex flex-wrap gap-2 mb-6 mt-1">
             {product.options.map((option, index) => (
               <button
-                key={`${option.id}-${index}`} // Combined ID and index to ensure uniqueness
+                key={`${option.id}-${index}`}
                 type="button"
                 onClick={(e) => {
                   e.preventDefault();
                   setSelectedOption(option);
                 }}
-                className={`text-[9px] font-bold px-2 py-1 rounded-md border transition-all ${
+                className={`text-[10px] font-bold px-3 py-1.5 rounded-xl border transition-all duration-300 ${
                   selectedOption?.id === option.id
-                    ? "bg-black dark:bg-white border-black dark:border-white text-white dark:text-black shadow-sm"
-                    : "bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 text-slate-500 dark:text-slate-400 hover:border-gray-200 dark:hover:border-gray-600"
+                    ? "bg-foreground border-foreground text-background shadow-md scale-105"
+                    : "bg-transparent border-black/10 dark:border-white/10 text-slate-500 dark:text-slate-400 hover:border-black/20 dark:hover:border-white/30 hover:bg-black/5 dark:hover:bg-white/5"
                 }`}
               >
                 {option.label}
@@ -124,30 +132,33 @@ export default function ProductCard({ product }: { product: Product }) {
           </div>
         )}
         
-        {/* Price Section */}
-        <div className="mt-auto">
+        {/* Spacer */}
+        <div className="flex-grow" />
+
+        {/* Price & Action Section */}
+        <div className="mt-4 pt-4 border-t border-black/5 dark:border-white/5">
           <div className="flex flex-col mb-4">
             <div className="flex items-baseline gap-1">
-              <span className="text-[10px] md:text-xs font-bold text-slate-400 font-mono">RM</span>
+              <span className="text-[10px] font-bold text-slate-400 font-mono">RM</span>
               
               {selectedOption ? (
-                 <span className="text-lg md:text-2xl font-black text-slate-900 dark:text-white tracking-tighter">
+                 <span className="font-outfit text-2xl font-black text-foreground tracking-tighter">
                    {selectedOption.price.toFixed(2)}
                  </span>
               ) : isRange ? (
-                 <span className="text-sm md:text-lg font-black text-slate-900 dark:text-white tracking-tighter">
-                   {minPrice.toFixed(2)} — {maxPrice.toFixed(2)}
+                 <span className="font-outfit text-lg font-black text-foreground tracking-tighter">
+                   {minPrice.toFixed(2)} <span className="text-slate-400 font-medium px-1">—</span> {maxPrice.toFixed(2)}
                  </span>
               ) : (
-                 <span className="text-lg md:text-2xl font-black text-slate-900 dark:text-white tracking-tighter">
+                 <span className="font-outfit text-2xl font-black text-foreground tracking-tighter">
                    {product.price.toFixed(2)}
                  </span>
               )}
             </div>
             
             {!selectedOption && isRange && (
-              <span className="text-[8px] uppercase font-bold text-gray-400 tracking-widest mt-0.5">
-                Multiple Options Available
+              <span className="text-[9px] uppercase font-bold text-slate-400 tracking-[0.1em] mt-1">
+                Select option above
               </span>
             )}
           </div>
@@ -155,10 +166,10 @@ export default function ProductCard({ product }: { product: Product }) {
           <button 
             type="button"
             onClick={handleAdd}
-            className="w-full bg-black dark:bg-white text-white dark:text-black py-2.5 md:py-3 rounded-lg md:rounded-xl text-xs md:text-sm font-bold hover:bg-gray-800 dark:hover:bg-gray-200 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm"
+            className="w-full bg-foreground text-background py-4 rounded-[1.25rem] text-sm font-bold hover:opacity-90 hover:shadow-lg transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-2 group/btn mt-2"
           >
-            <ShoppingCart size={16} strokeWidth={2.5} />
-            <span className="xs:inline">Add to Cart</span>
+            <ShoppingCart size={18} strokeWidth={2.5} className="group-hover/btn:-rotate-12 transition-transform duration-300" />
+            <span>Add to Cart</span>
           </button>
         </div>
       </div>

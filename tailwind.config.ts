@@ -9,6 +9,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        outfit: ['var(--font-outfit)', 'sans-serif'],
+      },
       colors: {
         // These match the variables we're putting in globals.css
         background: "var(--background)",
@@ -18,6 +21,12 @@ const config: Config = {
           hover: "var(--primary-hover)",
         },
         card: "var(--card)",
+      },
+      boxShadow: {
+        'premium': '0 20px 40px -15px rgba(0, 0, 0, 0.05)',
+        'premium-hover': '0 30px 60px -15px rgba(0, 0, 0, 0.1)',
+        'premium-dark': '0 20px 40px -15px rgba(255, 255, 255, 0.02)',
+        'premium-dark-hover': '0 30px 60px -15px rgba(255, 255, 255, 0.05)',
       },
     },
   },

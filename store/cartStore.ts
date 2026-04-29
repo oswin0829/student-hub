@@ -23,6 +23,7 @@ interface CartItem {
   category: string;
   selectedLabel?: string;
   variantLabel?: string;
+  image_url?: string;
 }
 
 interface CartStore {

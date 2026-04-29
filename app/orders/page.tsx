@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { motion } from 'framer-motion';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
@@ -131,95 +132,120 @@ export default function OrdersPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-background text-foreground flex items-center justify-center">
-        <div className="animate-pulse flex flex-col items-center">
-          <Package size={48} className="text-gray-400 mb-4" />
-          <h2 className="text-xl font-bold">Loading your orders...</h2>
+      <main className="min-h-screen bg-background text-foreground flex items-center justify-center relative">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/20 blur-[100px] rounded-full mix-blend-screen pointer-events-none" />
+        <div className="animate-pulse flex flex-col items-center relative z-10">
+          <Package size={48} className="text-primary mb-6 animate-bounce" />
+          <h2 className="font-outfit text-2xl font-black text-foreground">Loading your orders...</h2>
         </div>
       </main>
     );
   }
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+  };
+
   return (
-    <main className="min-h-screen bg-background text-foreground py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
+    <main className="min-h-screen bg-background text-foreground py-32 px-4 sm:px-6 lg:px-8 relative">
+      <div className="max-w-4xl mx-auto relative z-10">
         
-        <div className="flex items-center justify-between mb-8 border-b border-gray-100 dark:border-gray-800 pb-6">
+        <div className="flex items-center justify-between mb-12 pb-6 border-b border-black/5 dark:border-white/5">
           <div>
-            <Link href="/" className="inline-flex items-center gap-2 text-gray-500 hover:text-foreground transition-colors font-semibold mb-4">
-              <ArrowLeft size={16} /> Back to Store
+            <Link href="/" className="inline-flex items-center gap-2 text-slate-500 hover:text-primary transition-colors font-bold mb-4 text-sm group">
+              <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Back to Store
             </Link>
-            <h1 className="text-3xl font-black tracking-tight flex items-center gap-3">
-              <Package className="text-primary" size={32} strokeWidth={2.5} />
-              My Orders
+            <h1 className="font-outfit text-4xl font-black tracking-tight flex items-center gap-4">
+              <div className="p-3 bg-primary/10 rounded-2xl text-primary">
+                <Package size={28} strokeWidth={2.5} />
+              </div>
+              Order History
             </h1>
           </div>
         </div>
 
         {orders.length === 0 ? (
-          <div className="bg-card rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-12 text-center flex flex-col items-center">
-            <ShoppingBag size={64} className="text-gray-300 dark:text-gray-700 mb-6" />
-            <h2 className="text-2xl font-bold mb-2">No orders found</h2>
-            <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }} 
+            animate={{ opacity: 1, scale: 1 }} 
+            className="bg-white/50 dark:bg-black/50 backdrop-blur-xl rounded-[2.5rem] shadow-premium dark:shadow-premium-dark border border-black/5 dark:border-white/5 p-16 text-center flex flex-col items-center"
+          >
+            <div className="bg-slate-100 dark:bg-white/5 p-6 rounded-full mb-8">
+              <ShoppingBag size={48} className="text-slate-400 dark:text-slate-500" />
+            </div>
+            <h2 className="font-outfit text-3xl font-black mb-4">No orders found</h2>
+            <p className="text-slate-500 dark:text-slate-400 mb-10 max-w-md font-medium text-lg leading-relaxed">
               You haven&apos;t placed any orders yet. When you do, they will appear here so you can track their status.
             </p>
             <Link 
               href="/"
-              className="bg-primary hover:bg-primary-hover text-background px-8 py-3 rounded-xl font-bold transition-all"
+              className="bg-primary hover:bg-primary-hover text-white px-10 py-4 rounded-2xl font-bold transition-all shadow-premium"
             >
               Start Shopping
             </Link>
-          </div>
+          </motion.div>
         ) : (
-          <div className="space-y-6">
+          <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-8">
             {orders.map((order) => (
-              <div 
+              <motion.div 
+                variants={itemVariants}
                 key={order.transaction_id} 
-                className="bg-card rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden hover:border-gray-300 dark:hover:border-gray-700 transition-colors"
+                className="bg-white/50 dark:bg-[#111113]/80 backdrop-blur-xl rounded-3xl shadow-premium dark:shadow-premium-dark border border-black/5 dark:border-white/5 overflow-hidden hover:border-black/10 dark:hover:border-white/10 transition-all group"
               >
                 {/* Order Header */}
-                <div className="bg-gray-50 dark:bg-gray-900/50 p-5 md:p-6 border-b border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+                <div className="bg-slate-50/50 dark:bg-black/40 p-6 md:p-8 border-b border-black/5 dark:border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] bg-slate-200/50 dark:bg-white/10 px-2 py-1 rounded-md">
                         Order Placed
                       </span>
-                      <span className="text-sm font-semibold">
+                      <span className="text-sm font-bold text-foreground">
                         {new Date(order.created_at).toLocaleDateString('en-MY', {
                           day: 'numeric', month: 'short', year: 'numeric'
                         })}
                       </span>
                     </div>
-                    <div className="text-xs text-gray-400 dark:text-gray-500 font-mono">
-                      TXN: {order.transaction_id.substring(0, 8).toUpperCase()}...
+                    <div className="text-[11px] text-slate-400 font-mono font-medium">
+                      TXN: {order.transaction_id}
                     </div>
                   </div>
                   
-                  <div className="flex items-center justify-between sm:justify-end gap-6">
+                  <div className="flex items-center justify-between sm:justify-end gap-8">
                     <div className="flex flex-col sm:text-right">
-                      <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-1">
                         Total Amount
                       </span>
-                      <span className="text-lg font-black">
+                      <span className="font-outfit text-xl font-black text-foreground">
                         RM{order.total_amount.toFixed(2)}
                       </span>
                     </div>
                     
-                    {/* Status Badge */}
+                    {/* Status Badge - Now Glowing */}
                     <div className="flex-shrink-0">
                       {order.status === 'pending' ? (
-                        <div className="flex items-center gap-1.5 bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-500 px-3 py-1.5 rounded-full text-xs font-bold border border-yellow-200 dark:border-yellow-900/50 shadow-sm">
+                        <div className="flex items-center gap-2 bg-amber-500/10 text-amber-600 dark:text-amber-400 px-4 py-2 rounded-xl text-xs font-black shadow-[0_0_20px_rgba(245,158,11,0.2)] border border-amber-500/20">
                           <Clock size={14} />
-                          Pending
+                          PENDING
                         </div>
                       ) : order.status === 'fulfilled' || order.status === 'completed' ? (
-                        <div className="flex items-center gap-1.5 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-500 px-3 py-1.5 rounded-full text-xs font-bold border border-green-200 dark:border-green-900/50 shadow-sm">
+                        <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-xl text-xs font-black shadow-[0_0_20px_rgba(16,185,129,0.2)] border border-emerald-500/20">
                           <CheckCircle2 size={14} />
-                          Fulfilled
+                          FULFILLED
                         </div>
                       ) : (
-                        <div className="flex items-center gap-1.5 bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300 px-3 py-1.5 rounded-full text-xs font-bold border border-gray-200 dark:border-gray-700 shadow-sm">
-                          {order.status}
+                        <div className="flex items-center gap-2 bg-slate-500/10 text-slate-600 dark:text-slate-300 px-4 py-2 rounded-xl text-xs font-black border border-slate-500/20">
+                          {order.status.toUpperCase()}
                         </div>
                       )}
                     </div>
@@ -227,47 +253,45 @@ export default function OrdersPage() {
                 </div>
 
                 {/* Order Items List */}
-                <div className="p-5 md:p-6 divide-y divide-gray-100 dark:divide-gray-800">
+                <div className="p-6 md:p-8 divide-y divide-black/5 dark:divide-white/5">
                   {order.items.map((item, idx) => (
-                    <div key={item.id} className={`flex items-center gap-4 ${idx !== 0 ? 'pt-4' : 'pb-4'}`}>
-                      {/* Product Thumbnail (fallback to a gray box if no image) */}
-                      <div className="relative w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shrink-0">
+                    <div key={item.id} className={`flex items-center gap-6 ${idx !== 0 ? 'pt-6' : 'pb-6'}`}>
+                      {/* Product Thumbnail */}
+                      <div className="relative w-20 h-20 bg-slate-50 dark:bg-white/5 rounded-2xl overflow-hidden border border-black/5 dark:border-white/5 shrink-0 shadow-inner">
                         {item.products?.image_url ? (
                           <Image 
                             src={item.products.image_url} 
                             alt={item.products.name} 
                             fill 
-                            className="object-cover"
+                            className="object-cover transition-transform group-hover:scale-105"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400">
-                            <Package size={24} />
+                          <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-600">
+                            <Package size={28} />
                           </div>
                         )}
                       </div>
                       
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-base font-bold truncate">
+                        <h3 className="text-lg font-bold truncate text-foreground mb-1">
                           {item.products?.name || `Product #${item.product_id}`}
                         </h3>
                         {item.products?.category && (
-                          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mt-0.5">
+                          <p className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
                             {item.products.category}
                           </p>
                         )}
                       </div>
                       
-                      <div className="text-right shrink-0 ml-4">
-                        <span className="font-mono font-bold block">RM{Number(item.amount).toFixed(2)}</span>
+                      <div className="text-right shrink-0 ml-4 bg-slate-50 dark:bg-white/5 px-4 py-2 rounded-xl border border-black/5 dark:border-white/5">
+                        <span className="font-mono font-black block text-sm">RM{Number(item.amount).toFixed(2)}</span>
                       </div>
                     </div>
                   ))}
                 </div>
-
-                
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
     </main>

@@ -48,9 +48,9 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-[100] w-full border-b border-gray-100 dark:border-gray-800 bg-white/80 dark:bg-black/80 backdrop-blur-xl">
-      <div className="max-w-[1600px] mx-auto px-6 lg:px-12">
-        <div className="flex justify-between items-center h-20">
+    <nav className="fixed top-4 left-0 right-0 z-[100] w-full max-w-6xl mx-auto px-4 md:px-6 transition-all duration-300">
+      <div className="bg-white/70 dark:bg-black/60 backdrop-blur-2xl border border-black/5 dark:border-white/10 shadow-premium dark:shadow-premium-dark rounded-full px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16 md:h-20">
           
           {/* --- BRANDING SECTION --- */}
           <Link href="/" className="flex items-center gap-4 group">
@@ -58,7 +58,7 @@ export default function Navbar() {
               <Image src="/logo.png" alt="MegaHelper Store Logo" fill className="object-contain" priority />
             </div>
             <div className="flex flex-col">
-              <span className="text-2xl font-black text-gray-900 dark:text-white leading-none tracking-tighter">
+              <span className="font-outfit text-xl md:text-2xl font-black text-gray-900 dark:text-white leading-none tracking-tight">
                 MĒGA HELPER
               </span>
               <span className="text-[10px] font-bold uppercase text-black dark:text-white tracking-[0.3em] -mt-0.5">
@@ -74,7 +74,7 @@ export default function Navbar() {
 
             {user ? (
               // The User Pill Container
-              <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-900 p-1.5 pr-2 rounded-full border border-gray-100 dark:border-gray-800 overflow-hidden">
+              <div className="flex items-center gap-3 bg-white/50 dark:bg-white/5 p-1.5 pr-2 rounded-full border border-black/5 dark:border-white/10 shadow-sm backdrop-blur-md overflow-hidden">
                 
                 {/* User Avatar Circle */}
                 <div className="w-7 h-7 bg-black dark:bg-white text-white dark:text-black rounded-full flex items-center justify-center text-xs font-bold uppercase shrink-0">
@@ -160,7 +160,7 @@ export default function Navbar() {
             >
               <ShoppingCart size={28} strokeWidth={2.5} />
               {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-black dark:bg-white text-white dark:text-black text-[11px] font-black h-6 w-6 rounded-full flex items-center justify-center border-2 border-white dark:border-black shadow-md animate-in zoom-in duration-300">
+                <span className="absolute top-0 right-0 bg-primary text-background text-[11px] font-black h-5 w-5 rounded-full flex items-center justify-center border-2 border-white dark:border-black shadow-md animate-in zoom-in duration-300">
                   {totalItems}
                 </span>
               )}
