@@ -65,12 +65,12 @@ export default function ProductCard({ product }: { product: Product }) {
   };
 
   return (
-    <div className="bg-white dark:bg-[#111113]/80 border border-black/5 dark:border-white/10 rounded-[2rem] shadow-sm hover:shadow-premium dark:shadow-premium-dark overflow-hidden flex flex-row sm:flex-col group h-full transition-all duration-500 hover:-translate-y-0 sm:hover:-translate-y-2 hover:border-black/10 dark:hover:border-white/20">
+    <div className="bg-white dark:bg-[#111113]/80 border border-black/5 dark:border-white/10 rounded-[2rem] shadow-sm hover:shadow-premium dark:shadow-premium-dark overflow-hidden flex flex-col group h-full transition-all duration-500 hover:-translate-y-1 hover:border-black/10 dark:hover:border-white/20">
       
-      {/* Image Area - Square on mobile, 4/3 on desktop */}
+      {/* Image Area */}
       <Link 
         href={`/product/${product.id}`} 
-        className="relative w-28 sm:w-full flex-shrink-0 sm:aspect-[4/3] bg-slate-50 dark:bg-white/[0.02] flex items-center justify-center cursor-pointer overflow-hidden p-4 sm:p-8 self-stretch"
+        className="relative w-full aspect-square sm:aspect-[4/3] bg-slate-50 dark:bg-white/[0.02] flex items-center justify-center cursor-pointer overflow-hidden p-4 sm:p-8"
       >
         {product.image_url ? (
           <img 
