@@ -44,7 +44,7 @@ export default function SocialBubbles() {
   ];
 
  return (
-    <div className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-3 items-end pointer-events-none">
+    <div className="fixed bottom-20 sm:bottom-6 right-3 sm:right-6 z-[9999] flex flex-col gap-2 sm:gap-3 items-end pointer-events-none">
       {socialLinks.map((social) => (
         <a
           key={social.name}
@@ -53,12 +53,12 @@ export default function SocialBubbles() {
           rel="noopener noreferrer"
           className={`
             pointer-events-auto
-            group flex items-center gap-3 p-3.5 rounded-full text-white shadow-2xl 
+            group flex items-center gap-3 p-2.5 sm:p-3.5 rounded-full text-white shadow-2xl 
             transition-all duration-500 hover:scale-110 hover:-translate-x-2
             ${social.color}
           `}
         >
-          <span className="max-w-0 overflow-hidden whitespace-nowrap text-[10px] font-black transition-all duration-500 group-hover:max-w-xs group-hover:px-2 uppercase tracking-widest">
+          <span className="hidden sm:inline max-w-0 overflow-hidden whitespace-nowrap text-[10px] font-black transition-all duration-500 group-hover:max-w-xs group-hover:px-2 uppercase tracking-widest">
             {social.name}
           </span>
           {social.icon}
