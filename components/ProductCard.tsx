@@ -70,7 +70,7 @@ export default function ProductCard({ product }: { product: Product }) {
       {/* Image Area */}
       <Link 
         href={`/product/${product.id}`} 
-        className="relative w-full aspect-square sm:aspect-[4/3] bg-slate-50 dark:bg-white/[0.02] flex items-center justify-center cursor-pointer overflow-hidden p-4 sm:p-8"
+        className="relative w-full aspect-[4/3] bg-slate-50 dark:bg-white/[0.02] flex items-center justify-center cursor-pointer overflow-hidden p-3 sm:p-8"
       >
         {product.image_url ? (
           <img 
@@ -88,30 +88,30 @@ export default function ProductCard({ product }: { product: Product }) {
         <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
       </Link>
       
-      <div className="p-5 md:p-6 flex flex-col flex-grow relative">
+      <div className="p-3 sm:p-5 md:p-6 flex flex-col flex-grow relative">
         
         {/* Category Badge */}
-        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary dark:text-primary mb-3">
+        <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-primary dark:text-primary mb-1.5 sm:mb-3">
           {product.category || "General"}
         </p>
 
         {/* Title */}
         <Link href={`/product/${product.id}`}>
-          <h3 className="font-outfit text-xl font-black text-foreground mb-2 line-clamp-2 cursor-pointer group-hover:text-primary transition-colors leading-tight tracking-tight">
+          <h3 className="font-outfit text-[15px] sm:text-xl font-black text-foreground mb-1 sm:mb-2 line-clamp-2 cursor-pointer group-hover:text-primary transition-colors leading-tight tracking-tight">
             {product.name}
           </h3>
         </Link>
         
         {/* Description Snippet (if available) */}
         {product.description && (
-          <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mb-4 leading-relaxed">
+          <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mb-2 sm:mb-4 leading-relaxed">
             {product.description}
           </p>
         )}
 
         {/* Variant Selection Pills */}
         {product.options && product.options.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-6 mt-1">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-3 sm:mb-6 mt-1">
             {product.options.map((option, index) => (
               <button
                 key={`${option.id}-${index}`}
@@ -120,7 +120,7 @@ export default function ProductCard({ product }: { product: Product }) {
                   e.preventDefault();
                   setSelectedOption(option);
                 }}
-                className={`text-[10px] font-bold px-3 py-1.5 rounded-xl border transition-all duration-300 ${
+                className={`text-[9px] sm:text-[10px] font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg sm:rounded-xl border transition-all duration-300 ${
                   selectedOption?.id === option.id
                     ? "bg-foreground border-foreground text-background shadow-md scale-105"
                     : "bg-transparent border-black/10 dark:border-white/10 text-slate-500 dark:text-slate-400 hover:border-black/20 dark:hover:border-white/30 hover:bg-black/5 dark:hover:bg-white/5"
@@ -136,28 +136,28 @@ export default function ProductCard({ product }: { product: Product }) {
         <div className="flex-grow" />
 
         {/* Price & Action Section */}
-        <div className="mt-4 pt-4 border-t border-black/5 dark:border-white/5">
-          <div className="flex flex-col mb-4">
+        <div className="mt-2 sm:mt-4 pt-3 sm:pt-4 border-t border-black/5 dark:border-white/5">
+          <div className="flex flex-col mb-2 sm:mb-4">
             <div className="flex items-baseline gap-1">
-              <span className="text-[10px] font-bold text-slate-400 font-mono">RM</span>
+              <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 font-mono">RM</span>
               
               {selectedOption ? (
-                 <span className="font-outfit text-2xl font-black text-foreground tracking-tighter">
+                 <span className="font-outfit text-lg sm:text-2xl font-black text-foreground tracking-tighter">
                    {selectedOption.price.toFixed(2)}
                  </span>
               ) : isRange ? (
-                 <span className="font-outfit text-lg font-black text-foreground tracking-tighter">
+                 <span className="font-outfit text-sm sm:text-lg font-black text-foreground tracking-tighter">
                    {minPrice.toFixed(2)} <span className="text-slate-400 font-medium px-1">—</span> {maxPrice.toFixed(2)}
                  </span>
               ) : (
-                 <span className="font-outfit text-2xl font-black text-foreground tracking-tighter">
+                 <span className="font-outfit text-lg sm:text-2xl font-black text-foreground tracking-tighter">
                    {product.price.toFixed(2)}
                  </span>
               )}
             </div>
             
             {!selectedOption && isRange && (
-              <span className="text-[9px] uppercase font-bold text-slate-400 tracking-[0.1em] mt-1">
+              <span className="text-[8px] sm:text-[9px] uppercase font-bold text-slate-400 tracking-[0.1em] mt-0.5 sm:mt-1">
                 Select option above
               </span>
             )}
@@ -166,9 +166,9 @@ export default function ProductCard({ product }: { product: Product }) {
           <button 
             type="button"
             onClick={handleAdd}
-            className="w-full bg-foreground text-background py-4 rounded-[1.25rem] text-sm font-bold hover:opacity-90 hover:shadow-lg transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-2 group/btn mt-2"
+            className="w-full bg-foreground text-background py-2.5 sm:py-4 rounded-xl sm:rounded-[1.25rem] text-xs sm:text-sm font-bold hover:opacity-90 hover:shadow-lg transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-1.5 sm:gap-2 mt-1 sm:mt-2"
           >
-            <ShoppingCart size={18} strokeWidth={2.5} className="group-hover/btn:-rotate-12 transition-transform duration-300" />
+            <ShoppingCart size={16} strokeWidth={2.5} className="group-hover/btn:-rotate-12 transition-transform duration-300 sm:w-[18px] sm:h-[18px]" />
             <span>Add to Cart</span>
           </button>
         </div>
