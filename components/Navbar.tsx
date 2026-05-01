@@ -53,28 +53,28 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16 md:h-20">
           
           {/* --- BRANDING SECTION --- */}
-          <Link href="/" className="flex items-center gap-4 group">
-            <div className="relative w-12 h-12 transition-all duration-500 group-hover:scale-110 group-hover:rotate-[15deg]">
+          <Link href="/" className="flex items-center gap-2 md:gap-4 group">
+            <div className="relative w-9 h-9 md:w-12 md:h-12 transition-all duration-500 group-hover:scale-110 group-hover:rotate-[15deg] shrink-0">
               <Image src="/logo.png" alt="MegaHelper Store Logo" fill className="object-contain" priority />
             </div>
             <div className="flex flex-col">
-              <span className="font-outfit text-xl md:text-2xl font-black text-gray-900 dark:text-white leading-none tracking-tight">
+              <span className="font-outfit text-base sm:text-lg md:text-2xl font-black text-gray-900 dark:text-white leading-none tracking-tight">
                 MĒGA HELPER
               </span>
-              <span className="text-[10px] font-bold uppercase text-black dark:text-white tracking-[0.3em] -mt-0.5">
+              <span className="text-[8px] md:text-[10px] font-bold uppercase text-black dark:text-white tracking-[0.2em] md:tracking-[0.3em] mt-0.5 md:-mt-0.5">
                 Digital Assets
               </span>
             </div>
           </Link>
 
           {/* --- ACTIONS SECTION --- */}
-          <div className="flex items-center gap-4 md:gap-6">
+          <div className="flex items-center gap-2 sm:gap-4 md:gap-6 shrink-0">
             
             <ThemeToggle />
 
             {user ? (
               // The User Pill Container
-              <div className="flex items-center gap-3 bg-white/50 dark:bg-white/5 p-1.5 pr-2 rounded-full border border-black/5 dark:border-white/10 shadow-sm backdrop-blur-md overflow-hidden">
+              <div className="flex items-center gap-1.5 sm:gap-3 bg-white/50 dark:bg-white/5 p-1 sm:p-1.5 pr-1.5 sm:pr-2 rounded-full border border-black/5 dark:border-white/10 shadow-sm backdrop-blur-md overflow-hidden">
                 
                 {/* User Avatar Circle */}
                 <div className="w-7 h-7 bg-black dark:bg-white text-white dark:text-black rounded-full flex items-center justify-center text-xs font-bold uppercase shrink-0">
