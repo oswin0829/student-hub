@@ -206,11 +206,10 @@ export default function AdminOrdersPage() {
           <button
             key={s}
             onClick={() => setFilter(s)}
-            className={`px-4 py-1.5 rounded-lg font-bold text-sm capitalize transition-all ${
-              filter === s
+            className={`px-4 py-1.5 rounded-lg font-bold text-sm capitalize transition-all ${filter === s
                 ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white'
                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-            }`}
+              }`}
           >
             {s}
           </button>

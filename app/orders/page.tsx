@@ -49,7 +49,7 @@ export default function OrdersPage() {
   useEffect(() => {
     async function fetchOrders() {
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       if (!session?.user?.email) {
         router.push('/login?redirect=/orders');
         return;
@@ -78,7 +78,7 @@ export default function OrdersPage() {
           .in('id', productIds);
 
         if (productsError) {
-           console.warn("Could not fetch product details:", productsError);
+          console.warn("Could not fetch product details:", productsError);
         }
 
         const productMap = (productsData || []).reduce((acc: Record<number, Product>, p) => {
@@ -89,7 +89,7 @@ export default function OrdersPage() {
         // 3. Group by transaction_id and attach product info
         const grouped = (ordersData as OrderRow[]).reduce((acc: Record<string, GroupedOrder>, row) => {
           const txId = row.transaction_id || `legacy-${row.id}`;
-          
+
           if (!acc[txId]) {
             acc[txId] = {
               transaction_id: txId,
@@ -99,20 +99,20 @@ export default function OrdersPage() {
               items: []
             };
           }
-          
+
           acc[txId].total_amount += Number(row.amount);
-          
+
           // Attach product info manually
           const rowWithProduct = {
             ...row,
             products: productMap[row.product_id]
           };
-          
+
           acc[txId].items.push(rowWithProduct);
           return acc;
         }, {});
 
-        const groupedArray = Object.values(grouped).sort((a, b) => 
+        const groupedArray = Object.values(grouped).sort((a, b) =>
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );
 
@@ -160,7 +160,7 @@ export default function OrdersPage() {
   return (
     <main className="min-h-screen bg-background text-foreground py-32 px-4 sm:px-6 lg:px-8 relative">
       <div className="max-w-4xl mx-auto relative z-10">
-        
+
         <div className="flex items-center justify-between mb-12 pb-6 border-b border-black/5 dark:border-white/5">
           <div>
             <Link href="/" className="inline-flex items-center gap-2 text-slate-500 hover:text-primary transition-colors font-bold mb-4 text-sm group">
@@ -176,9 +176,9 @@ export default function OrdersPage() {
         </div>
 
         {orders.length === 0 ? (
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }} 
-            animate={{ opacity: 1, scale: 1 }} 
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
             className="bg-white/50 dark:bg-black/50 backdrop-blur-xl rounded-[2.5rem] shadow-premium dark:shadow-premium-dark border border-black/5 dark:border-white/5 p-16 text-center flex flex-col items-center"
           >
             <div className="bg-slate-100 dark:bg-white/5 p-6 rounded-full mb-8">
@@ -188,7 +188,7 @@ export default function OrdersPage() {
             <p className="text-slate-500 dark:text-slate-400 mb-10 max-w-md font-medium text-lg leading-relaxed">
               You haven&apos;t placed any orders yet. When you do, they will appear here so you can track their status.
             </p>
-            <Link 
+            <Link
               href="/"
               className="bg-primary hover:bg-primary-hover text-white px-10 py-4 rounded-2xl font-bold transition-all shadow-premium"
             >
@@ -198,9 +198,9 @@ export default function OrdersPage() {
         ) : (
           <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-8">
             {orders.map((order) => (
-              <motion.div 
+              <motion.div
                 variants={itemVariants}
-                key={order.transaction_id} 
+                key={order.transaction_id}
                 className="bg-white/50 dark:bg-[#111113]/80 backdrop-blur-xl rounded-3xl shadow-premium dark:shadow-premium-dark border border-black/5 dark:border-white/5 overflow-hidden hover:border-black/10 dark:hover:border-white/10 transition-all group"
               >
                 {/* Order Header */}
@@ -220,7 +220,7 @@ export default function OrdersPage() {
                       TXN: {order.transaction_id}
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center justify-between sm:justify-end gap-8">
                     <div className="flex flex-col sm:text-right">
                       <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-1">
@@ -230,7 +230,7 @@ export default function OrdersPage() {
                         RM{order.total_amount.toFixed(2)}
                       </span>
                     </div>
-                    
+
                     {/* Status Badge - Now Glowing */}
                     <div className="flex-shrink-0">
                       {order.status === 'pending' ? (
@@ -259,10 +259,10 @@ export default function OrdersPage() {
                       {/* Product Thumbnail */}
                       <div className="relative w-20 h-20 bg-slate-50 dark:bg-white/5 rounded-2xl overflow-hidden border border-black/5 dark:border-white/5 shrink-0 shadow-inner">
                         {item.products?.image_url ? (
-                          <Image 
-                            src={item.products.image_url} 
-                            alt={item.products.name} 
-                            fill 
+                          <Image
+                            src={item.products.image_url}
+                            alt={item.products.name}
+                            fill
                             className="object-cover transition-transform group-hover:scale-105"
                           />
                         ) : (
@@ -271,7 +271,7 @@ export default function OrdersPage() {
                           </div>
                         )}
                       </div>
-                      
+
                       <div className="flex-1 min-w-0">
                         <h3 className="text-lg font-bold truncate text-foreground mb-1">
                           {item.products?.name || `Product #${item.product_id}`}
@@ -282,7 +282,7 @@ export default function OrdersPage() {
                           </p>
                         )}
                       </div>
-                      
+
                       <div className="text-right shrink-0 ml-4 bg-slate-50 dark:bg-white/5 px-4 py-2 rounded-xl border border-black/5 dark:border-white/5">
                         <span className="font-mono font-black block text-sm">RM{Number(item.amount).toFixed(2)}</span>
                       </div>

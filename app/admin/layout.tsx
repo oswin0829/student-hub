@@ -20,14 +20,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       if (!session) {
         // 1. Not logged in at all? Go to login page.
-        router.push('/login'); 
+        router.push('/login');
       } else if (!ALLOWED_ADMIN_EMAILS.includes(session.user.email || '')) {
         // 2. Logged in, but NOT an admin? Kick them to the storefront!
         toast.error("Access Denied: You do not have admin privileges.");
-        router.push('/'); 
+        router.push('/');
       } else {
         // 3. Logged in AND email matches? Welcome in, Boss.
         setIsAuthorized(true);
@@ -43,7 +43,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-black">
-      {children} 
+      {children}
     </div>
   );
 }

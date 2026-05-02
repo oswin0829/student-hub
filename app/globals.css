@@ -4,9 +4,17 @@
 @variant dark (&:where(.dark, .dark *));
 
 @keyframes gradient {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .animate-gradient {
@@ -14,43 +22,39 @@
 }
 
 @layer utilities {
+
   /* Custom thin scrollbar for categories */
   .custom-scrollbar::-webkit-scrollbar {
-    height: 5px; /* Height for horizontal scrollbar */
+    height: 5px;
+    /* Height for horizontal scrollbar */
   }
 
   .custom-scrollbar::-webkit-scrollbar-track {
-    background: #f1f5f9; /* slate-100 */
+    background: #f1f5f9;
+    /* slate-100 */
     border-radius: 10px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #cbd5e1; /* slate-300 */
+    background: #cbd5e1;
+    /* slate-300 */
     border-radius: 10px;
     transition: all 0.3s ease;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #475569; /* slate-600 */
+    background: #475569;
+    /* slate-600 */
   }
 }
 
 @layer base {
   :root {
-    /* Light Mode - Sleek Slate aesthetic to completely eliminate bright white glare */
-    --background: #e2e8f0;
-    --foreground: #0f172a;
-    --primary: #5a51e6;
-    --primary-hover: #4338ca;
-    --card: #ffffff;
-  }
-
-  [data-theme='dark'] {
-    /* Dark Mode */
+    /* Permanent Dark Mode */
     --background: #09090b;
     --foreground: #ffffff;
-    --primary: #6366f1;
-    --primary-hover: #818cf8;
+    --primary: #8b5cf6; /* violet-500 */
+    --primary-hover: #7c3aed; /* violet-600 */
     --card: #141417;
   }
 }

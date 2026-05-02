@@ -34,7 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         bg-background
         selection:bg-slate-200 selection:text-black dark:selection:bg-slate-800 dark:selection:text-white
       `}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+        <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" disableTransitionOnChange>
           <Toaster position="top-center" richColors /> 
           
           <Navbar />

@@ -3,14 +3,13 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ShoppingCart, User, LogOut, Package } from 'lucide-react'; 
+import { ShoppingCart, User, LogOut, Package } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import { createBrowserClient } from '@supabase/ssr';
-import type { User as SupabaseUser } from '@supabase/supabase-js'; 
-import { toast } from 'sonner'; 
+import type { User as SupabaseUser } from '@supabase/supabase-js';
+import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion'; // <-- Imported Framer Motion
 
-import { ThemeToggle } from '@/components/ThemeToggle';
 
 // Initialize Supabase Client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
@@ -20,11 +19,11 @@ const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);
 export default function Navbar() {
   const { cart } = useCartStore();
   const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
-  
+
   const [user, setUser] = useState<SupabaseUser | null>(null);
-  
+
   // <-- NEW: State to track if they clicked logout
-  const [isConfirmingLogout, setIsConfirmingLogout] = useState(false); 
+  const [isConfirmingLogout, setIsConfirmingLogout] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -51,7 +50,7 @@ export default function Navbar() {
     <nav className="fixed top-4 left-0 right-0 z-[100] w-full max-w-6xl mx-auto px-4 md:px-6 transition-all duration-300">
       <div className="bg-white/70 dark:bg-black/60 backdrop-blur-2xl border border-black/5 dark:border-white/10 shadow-premium dark:shadow-premium-dark rounded-full px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 md:h-20">
-          
+
           {/* --- BRANDING SECTION --- */}
           <Link href="/" className="flex items-center gap-2 md:gap-4 group">
             <div className="relative w-9 h-9 md:w-12 md:h-12 transition-all duration-500 group-hover:scale-110 group-hover:rotate-[15deg] shrink-0">
@@ -69,18 +68,17 @@ export default function Navbar() {
 
           {/* --- ACTIONS SECTION --- */}
           <div className="flex items-center gap-2 sm:gap-4 md:gap-6 shrink-0">
-            
-            <ThemeToggle />
+
 
             {user ? (
               // The User Pill Container
               <div className="flex items-center gap-1.5 sm:gap-3 bg-white/50 dark:bg-white/5 p-1 sm:p-1.5 pr-1.5 sm:pr-2 rounded-full border border-black/5 dark:border-white/10 shadow-sm backdrop-blur-md overflow-hidden">
-                
+
                 {/* User Avatar Circle */}
                 <div className="w-7 h-7 bg-black dark:bg-white text-white dark:text-black rounded-full flex items-center justify-center text-xs font-bold uppercase shrink-0">
                   {user.email?.charAt(0)}
                 </div>
-                
+
                 {/* User Email */}
                 <span className="hidden md:block text-sm font-bold text-slate-700 dark:text-slate-300 max-w-[120px] truncate pl-1">
                   {user.email}
@@ -133,8 +131,8 @@ export default function Navbar() {
 
               </div>
             ) : (
-              <Link 
-                href="/login" 
+              <Link
+                href="/login"
                 className="flex items-center gap-2 text-base font-bold text-gray-500 hover:text-black dark:hover:text-white transition-colors group"
               >
                 <User size={22} strokeWidth={2.5} className="group-hover:translate-y-[-1px] transition-transform" />
@@ -144,8 +142,8 @@ export default function Navbar() {
 
             {/* Orders Icon (Logged In Only) */}
             {user && (
-              <Link 
-                href="/orders" 
+              <Link
+                href="/orders"
                 className="relative p-2 text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-all active:scale-90"
                 title="My Orders"
               >
@@ -154,8 +152,8 @@ export default function Navbar() {
             )}
 
             {/* Cart Icon */}
-            <Link 
-              href="/checkout" 
+            <Link
+              href="/checkout"
               className="relative p-2 text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-all active:scale-90"
             >
               <ShoppingCart size={28} strokeWidth={2.5} />
