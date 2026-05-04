@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 
 export default function TermsOfService() {
   return (
-    <main className="min-h-screen bg-background text-foreground py-16 px-6 sm:px-8 lg:px-12">
+    <main className="min-h-screen bg-background text-foreground pt-32 pb-16 px-6 sm:px-8 lg:px-12">
       <div className="max-w-3xl mx-auto">
         <Link 
           href="/" 

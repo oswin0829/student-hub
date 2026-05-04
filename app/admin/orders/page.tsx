@@ -168,7 +168,7 @@ export default function AdminOrdersPage() {
   const pendingCount = orders.filter(o => o.status === 'pending').length;
 
   return (
-    <main className="max-w-5xl mx-auto p-6 md:p-10 pb-24">
+    <main className="max-w-5xl mx-auto px-6 md:px-10 pt-28 pb-24">
       {/* ── Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ShoppingCart, User, LogOut, Package } from 'lucide-react';
+import { ShoppingCart, User, LogOut, Package, Shield } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import { createBrowserClient } from '@supabase/ssr';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
@@ -15,6 +15,9 @@ import { motion, AnimatePresence } from 'framer-motion'; // <-- Imported Framer 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);
+
+// Admin emails that should see the shield icon
+const ALLOWED_ADMIN_EMAILS = ['oswincheong@gmail.com', 'chinleon.cl@gmail.com'];
 
 export default function Navbar() {
   const { cart } = useCartStore();
@@ -68,6 +71,18 @@ export default function Navbar() {
 
           {/* --- ACTIONS SECTION --- */}
           <div className="flex items-center gap-2 sm:gap-4 md:gap-6 shrink-0">
+
+            {/* Admin Shield Icon (Admin Only) */}
+            {user && ALLOWED_ADMIN_EMAILS.includes(user.email || '') && (
+              <Link
+                href="/admin"
+                className="relative p-2 text-amber-500 dark:text-amber-400 hover:text-amber-600 dark:hover:text-amber-300 transition-all active:scale-90"
+                title="Admin Dashboard"
+              >
+                <Shield size={24} strokeWidth={2.5} />
+              </Link>
+            )}
+
 
 
             {user ? (

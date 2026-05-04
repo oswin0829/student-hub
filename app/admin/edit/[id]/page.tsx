@@ -145,7 +145,7 @@ export default function EditProductPage() {
   if (fetching) return <div className="p-12 text-center text-slate-400 font-bold">Loading...</div>;
 
   return (
-    <div className="max-w-3xl mx-auto p-8 pb-24">
+    <div className="max-w-3xl mx-auto px-8 pt-28 pb-24">
       <Link href="/admin" className="text-sm font-bold text-slate-400 dark:text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 flex items-center gap-2 mb-6 w-fit transition-colors">
         <ArrowLeft size={16} /> Back to Dashboard
       </Link>

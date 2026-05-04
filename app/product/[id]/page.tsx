@@ -15,7 +15,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   if (error || !product) notFound();
 
   return (
-    <main className="min-h-screen bg-white dark:bg-black py-12 md:py-24">
+    <main className="min-h-screen bg-white dark:bg-black pt-28 pb-12 md:pt-32 md:pb-24">
       <div className="max-w-6xl mx-auto px-4 md:px-8">
         
         {/* --- TOP SECTION: Purchase Focus --- */}
