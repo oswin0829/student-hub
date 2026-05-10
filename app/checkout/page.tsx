@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'; 
 import { useCartStore } from '@/store/cartStore';
-import { createPayment } from '@/app/actions/checkout';
+import { createPayment, checkFirstPurchaseEligibility } from '@/app/actions/checkout';
 import { Trash2, Plus, Minus, ShoppingBag, AlertCircle, CheckCircle2, Lock } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -21,6 +21,9 @@ export default function CheckoutPage() {
   const [userEmail, setUserEmail] = useState<string>('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isConfirmingClear, setIsConfirmingClear] = useState(false);
+  
+  const [isFirstPurchaseEligible, setIsFirstPurchaseEligible] = useState(false);
+  const [isCheckingEligibility, setIsCheckingEligibility] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -30,6 +33,31 @@ export default function CheckoutPage() {
       }
     });
   }, []);
+
+  useEffect(() => {
+    const checkEligibility = async () => {
+      if (userEmail && userEmail.includes('@')) {
+        setIsCheckingEligibility(true);
+        try {
+          const eligible = await checkFirstPurchaseEligibility(userEmail);
+          setIsFirstPurchaseEligible(eligible);
+        } catch (error) {
+          console.error("Error checking eligibility:", error);
+          setIsFirstPurchaseEligible(false);
+        } finally {
+          setIsCheckingEligibility(false);
+        }
+      } else {
+        setIsFirstPurchaseEligible(false);
+      }
+    };
+
+    const timeoutId = setTimeout(() => {
+      checkEligibility();
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [userEmail]);
 
   if (cart.length === 0) {
     return (
@@ -120,7 +148,6 @@ export default function CheckoutPage() {
               </div>
               
               <form action={createPayment} className="space-y-10">
-                <input type="hidden" name="amount" value={cartTotal()} />
                 <input type="hidden" name="cartData" value={JSON.stringify(cart)} />
                 
                 <div className="space-y-6">
@@ -199,10 +226,10 @@ export default function CheckoutPage() {
 
                   <button 
                     type="submit"
-                    disabled={cart.length === 0}
+                    disabled={cart.length === 0 || isCheckingEligibility}
                     className="w-full bg-primary text-white py-5 rounded-2xl font-bold text-lg hover:bg-primary-hover transition-all active:scale-[0.98] shadow-premium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 group"
                   >
-                    <span>Pay RM{cartTotal().toFixed(2)}</span>
+                    <span>{isCheckingEligibility ? 'Verifying...' : `Pay RM${isFirstPurchaseEligible ? (cartTotal() * 0.9).toFixed(2) : cartTotal().toFixed(2)}`}</span>
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
                   </button>
                 </div>
@@ -303,9 +330,25 @@ export default function CheckoutPage() {
               <div className="bg-slate-50/50 dark:bg-black/20 p-8 border-t border-black/5 dark:border-white/5">
                 <div className="flex items-center justify-between">
                   <span className="font-outfit text-lg font-bold text-slate-500">Total</span>
-                  <span className="font-outfit text-4xl font-black tracking-tighter text-foreground">
-                    RM{cartTotal().toFixed(2)}
-                  </span>
+                  <div className="text-right">
+                    {isFirstPurchaseEligible ? (
+                      <>
+                        <span className="font-outfit text-xl font-bold text-slate-400 line-through block mb-1">
+                          RM{cartTotal().toFixed(2)}
+                        </span>
+                        <span className="font-outfit text-4xl font-black tracking-tighter text-emerald-500">
+                          RM{(cartTotal() * 0.9).toFixed(2)}
+                        </span>
+                        <span className="text-xs font-bold text-emerald-500 uppercase tracking-widest block mt-1">
+                          First Purchase 10% Off
+                        </span>
+                      </>
+                    ) : (
+                      <span className="font-outfit text-4xl font-black tracking-tighter text-foreground">
+                        RM{cartTotal().toFixed(2)}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

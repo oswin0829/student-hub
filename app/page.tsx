@@ -1,7 +1,8 @@
 import { supabase } from '@/utils/supabase';
 import Storefront from '@/components/Storefront';
 import * as motion from "framer-motion/client";
-import { Shield, Clock, MousePointer2 } from 'lucide-react';
+import { Shield, Clock, MousePointer2, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 
 export default async function Home() {
   // We fetch all products once on the server
@@ -54,10 +55,38 @@ export default async function Home() {
 
             <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }} className="relative z-10">
               <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-primary dark:text-primary mb-6 block">Exceptional Service • Verified Reliability</span>
-              <h1 className="font-outfit text-6xl md:text-8xl font-black text-black dark:text-white mb-8 tracking-tighter leading-[1.05]">
+              <h1 className="font-outfit text-6xl md:text-8xl font-black text-black dark:text-white mb-6 tracking-tighter leading-[1.05]">
                 Welcome to <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-violet-500 dark:from-primary dark:to-violet-400">MegaHelper</span>
               </h1>
+              
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9, y: 10 }} 
+                animate={{ opacity: 1, scale: 1, y: 0 }} 
+                transition={{ delay: 0.3, duration: 0.5, type: "spring" }}
+                className="mb-8 inline-block"
+              >
+                <Link 
+                  href="/login"
+                  className="inline-flex items-center gap-3 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 hover:from-emerald-500/20 hover:to-teal-500/20 border border-emerald-500/20 dark:border-emerald-400/20 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full shadow-[0_0_30px_rgba(16,185,129,0.15)] hover:shadow-[0_0_40px_rgba(16,185,129,0.25)] relative overflow-hidden group cursor-pointer transition-all active:scale-95"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/0 via-emerald-400/10 to-emerald-400/0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
+                  <span className="flex h-2 w-2 relative">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  <span className="text-sm font-black uppercase tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-300">
+                    🎉 10% OFF First Purchase
+                  </span>
+                  <span className="text-xs font-bold text-emerald-700/60 dark:text-emerald-300/50 hidden md:inline-block border-l border-emerald-500/20 pl-3">
+                    Auto-applies at checkout
+                  </span>
+                  <span className="text-[10px] sm:text-xs font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-500 px-3 py-1 rounded-full hidden sm:inline-flex items-center gap-1 shadow-sm ml-1 group-hover:scale-105 transition-transform">
+                    Claim & Sign Up <ArrowRight size={12} strokeWidth={3} />
+                  </span>
+                </Link>
+              </motion.div>
+
               <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-xl mx-auto mb-10">
                 Your destination for high-quality digital assets. <br /> Built on trust and dedicated to your success.
               </p>

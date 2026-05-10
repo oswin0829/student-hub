@@ -61,6 +61,7 @@ export default function OrdersPage() {
           .from('orders')
           .select('*')
           .eq('customer_email', session.user.email)
+          .neq('status', 'awaiting_payment')
           .order('created_at', { ascending: false });
 
         if (ordersError) throw ordersError;

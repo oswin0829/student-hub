@@ -52,7 +52,7 @@ interface GroupedOrder {
   items: OrderRow[];
 }
 
-type StatusFilter = 'all' | 'pending' | 'fulfilled';
+type StatusFilter = 'all' | 'awaiting_payment' | 'pending' | 'fulfilled';
 
 /* ---------- helpers ---------- */
 function groupOrders(rows: OrderRow[]): GroupedOrder[] {
@@ -201,8 +201,8 @@ export default function AdminOrdersPage() {
       </div>
 
       {/* ── Filter tabs ── */}
-      <div className="flex gap-2 mb-6 bg-slate-100 dark:bg-slate-800/60 p-1 rounded-xl w-fit">
-        {(['all', 'pending', 'fulfilled'] as StatusFilter[]).map(s => (
+      <div className="flex gap-2 mb-6 bg-slate-100 dark:bg-slate-800/60 p-1 rounded-xl w-fit flex-wrap">
+        {(['all', 'awaiting_payment', 'pending', 'fulfilled'] as StatusFilter[]).map(s => (
           <button
             key={s}
             onClick={() => setFilter(s)}
@@ -211,7 +211,7 @@ export default function AdminOrdersPage() {
                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
               }`}
           >
-            {s}
+            {s.replace('_', ' ')}
           </button>
         ))}
       </div>
@@ -262,7 +262,11 @@ export default function AdminOrdersPage() {
                   </span>
 
                   {/* Status badge */}
-                  {order.status === 'pending' ? (
+                  {order.status === 'awaiting_payment' ? (
+                    <span className="flex items-center gap-1.5 bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 px-3 py-1.5 rounded-full text-xs font-bold border border-red-200 dark:border-red-800">
+                      <Clock size={13} /> Awaiting Payment
+                    </span>
+                  ) : order.status === 'pending' ? (
                     <span className="flex items-center gap-1.5 bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 px-3 py-1.5 rounded-full text-xs font-bold border border-yellow-200 dark:border-yellow-800">
                       <Clock size={13} /> Pending
                     </span>
@@ -273,7 +277,9 @@ export default function AdminOrdersPage() {
                   )}
 
                   {/* Action button */}
-                  {order.status === 'pending' ? (
+                  {order.status === 'awaiting_payment' ? (
+                    <span className="text-xs font-medium text-slate-400 italic">No actions available</span>
+                  ) : order.status === 'pending' ? (
                     <button
                       onClick={() => updateStatus(order.transaction_id, 'fulfilled')}
                       disabled={updating === order.transaction_id}

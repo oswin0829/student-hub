@@ -17,6 +17,12 @@
   }
 }
 
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 .animate-gradient {
   animation: gradient 8s linear infinite;
 }
